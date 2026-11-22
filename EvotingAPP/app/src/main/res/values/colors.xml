@@ -3,23 +3,30 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <!-- Palet civic-tech -->
-    <color name="brand_primary">#1E3A8A</color>
-    <color name="brand_primary_container">#DBE4FF</color>
-    <color name="brand_on_primary_container">#0B1F5C</color>
-    <color name="brand_secondary">#0F766E</color>
-    <color name="brand_secondary_container">#CCF1EC</color>
-    <color name="surface_bg">#F4F6FB</color>
-    <color name="text_muted">#5B6475</color>
-    <color name="outline_soft">#D9DEE8</color>
+    <!-- Tema "Gelap elegan": latar biru-abu tua, aksen toska -->
+    <color name="brand_primary">#26C6A6</color>              <!-- aksen toska -->
+    <color name="on_accent">#06241E</color>                  <!-- teks/ikon di atas toska -->
+    <color name="ink_deep">#0D131B</color>                   <!-- header -->
+    <color name="brand_primary_container">#123A34</color>    <!-- wadah toska gelap -->
+    <color name="brand_on_primary_container">#9AF2DE</color>
+    <color name="on_ink_muted">#93A1B3</color>
+    <color name="on_ink_faint">#34445A</color>
 
-    <!-- Status -->
-    <color name="status_success">#15803D</color>
-    <color name="status_success_bg">#DCFCE7</color>
-    <color name="status_danger">#B91C1C</color>
-    <color name="status_danger_bg">#FEE2E2</color>
-    <color name="status_warning">#B45309</color>
-    <color name="status_warning_bg">#FEF3C7</color>
-    <color name="status_neutral">#334155</color>
-    <color name="status_neutral_bg">#E2E8F0</color>
+    <!-- Permukaan & teks -->
+    <color name="surface_bg">#121A24</color>
+    <color name="surface">#1C2633</color>
+    <color name="surface_high">#243142</color>
+    <color name="text_primary">#E8EEF5</color>
+    <color name="text_muted">#93A1B3</color>
+    <color name="outline_soft">#2E3B4D</color>
+
+    <!-- Status (teks terang di atas latar gelap) -->
+    <color name="status_success">#4ADE9B</color>
+    <color name="status_success_bg">#123327</color>
+    <color name="status_danger">#FF7A7A</color>
+    <color name="status_danger_bg">#3A1C22</color>
+    <color name="status_warning">#FBC15A</color>
+    <color name="status_warning_bg">#382C14</color>
+    <color name="status_neutral">#B4C0CF</color>
+    <color name="status_neutral_bg">#263243</color>
 </resources>

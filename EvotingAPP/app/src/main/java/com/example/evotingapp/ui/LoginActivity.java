@@ -25,6 +25,10 @@ public class LoginActivity extends BaseActivity {
         inputPassword = findViewById(R.id.inputPassword);
 
         findViewById(R.id.btnLogin).setOnClickListener(v -> onLoginClicked());
+        inputPassword.setOnEditorActionListener((v, actionId, event) -> {
+            onLoginClicked();
+            return true;
+        });
         findViewById(R.id.btnDemoVoter).setOnClickListener(v -> fillDemoAccount("pemilih1"));
         findViewById(R.id.btnDemoPanwas).setOnClickListener(v -> fillDemoAccount("panwas1"));
         findViewById(R.id.btnDemoKpu).setOnClickListener(v -> fillDemoAccount("kpu1"));

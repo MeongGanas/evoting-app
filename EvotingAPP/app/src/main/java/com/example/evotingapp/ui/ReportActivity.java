@@ -17,19 +17,20 @@ import com.example.evotingapp.service.ElectionException;
 import com.example.evotingapp.service.IIdentityStrategy;
 import com.example.evotingapp.service.IdentifiedStrategy;
 import com.example.evotingapp.service.ReportService;
-import com.google.android.material.materialswitch.MaterialSwitch;
+import com.google.android.material.button.MaterialButtonToggleGroup;
 
 import java.util.List;
 
-/** Laporan dugaan pelanggaran: kirim (anonim/teridentifikasi), lacak, dan tindak lanjut Panwas. */
+/** Laporan dugaan pelanggaran: kirim (anonim/dengan nama), lacak, dan tindak lanjut Panwas. */
 public class ReportActivity extends BaseActivity {
     private ReportService reportService;
     private User user;
-    private boolean isAuditor;
 
     private EditText inputDescription;
-    private MaterialSwitch switchAnonymous;
-    private TextView tvTicketResult;
+    private MaterialButtonToggleGroup toggleIdentity;
+    private TextView tvIdentityHint;
+    private View ticketPanel;
+    private TextView tvTicketCode;
     private EditText inputTicket;
     private LinearLayout trackResultContainer;
     private LinearLayout reportsContainer;
@@ -44,37 +45,51 @@ public class ReportActivity extends BaseActivity {
         }
         setContentView(R.layout.activity_report);
         reportService = container().reportService();
-        isAuditor = user instanceof IAuditCapable && ((IAuditCapable) user).canUpdateReport();
+        boolean isAuditor = user instanceof IAuditCapable && ((IAuditCapable) user).canUpdateReport();
 
         inputDescription = findViewById(R.id.inputDescription);
-        switchAnonymous = findViewById(R.id.switchAnonymous);
-        tvTicketResult = findViewById(R.id.tvTicketResult);
+        toggleIdentity = findViewById(R.id.toggleIdentity);
+        tvIdentityHint = findViewById(R.id.tvIdentityHint);
+        ticketPanel = findViewById(R.id.ticketPanel);
+        tvTicketCode = findViewById(R.id.tvTicketCode);
         inputTicket = findViewById(R.id.inputTicket);
         trackResultContainer = findViewById(R.id.trackResultContainer);
         reportsContainer = findViewById(R.id.reportsContainer);
         tvNoReports = findViewById(R.id.tvNoReports);
 
+        toggleIdentity.addOnButtonCheckedListener((g, id, checked) -> updateIdentityHint());
+        updateIdentityHint();
         findViewById(R.id.btnSubmitReport).setOnClickListener(v -> onSubmitReport());
         findViewById(R.id.btnTrack).setOnClickListener(v -> onTrackTicket());
 
         if (isAuditor) {
+            setupHeader("Tindak lanjut laporan", "Tinjau laporan yang masuk dan perbarui statusnya agar pelapor bisa melacaknya.");
             findViewById(R.id.panwasSection).setVisibility(View.VISIBLE);
             findViewById(R.id.formCard).setVisibility(View.GONE);
             renderAllReports();
+        } else {
+            setupHeader("Laporan pelanggaran", "Laporkan dugaan kecurangan. Anda bisa melapor tanpa menyebutkan nama.");
         }
+    }
+
+    private boolean isAnonymous() {
+        return toggleIdentity.getCheckedButtonId() == R.id.btnAnonymous;
+    }
+
+    private void updateIdentityHint() {
+        tvIdentityHint.setText(isAnonymous()
+                ? "Nama Anda tidak disimpan. Pengawas hanya melihat \"Anonim\"."
+                : "Pengawas melihat username Anda dan dapat menghubungi Anda.");
     }
 
     private void onSubmitReport() {
         // Strategy Pattern: identitas pelapor ditentukan oleh strategi yang dipilih.
-        IIdentityStrategy strategy = switchAnonymous.isChecked()
-                ? new AnonymousStrategy()
-                : new IdentifiedStrategy();
+        IIdentityStrategy strategy = isAnonymous() ? new AnonymousStrategy() : new IdentifiedStrategy();
         try {
             String ticket = reportService.submitReport(user, strategy, inputDescription.getText().toString());
             inputDescription.setText("");
-            tvTicketResult.setText("Laporan terkirim. Simpan Kode Tiket Anda:\n" + ticket
-                    + "\nGunakan kode ini untuk melacak status tindak lanjut.");
-            tvTicketResult.setVisibility(View.VISIBLE);
+            tvTicketCode.setText(ticket);
+            ticketPanel.setVisibility(View.VISIBLE);
             inputTicket.setText(ticket);
         } catch (ElectionException e) {
             toast(e.getMessage());
@@ -85,7 +100,7 @@ public class ReportActivity extends BaseActivity {
         trackResultContainer.removeAllViews();
         ViolationReport report = reportService.trackReport(inputTicket.getText().toString());
         if (report == null) {
-            toast("Kode Tiket tidak ditemukan.");
+            toast("Kode tiket tidak ditemukan. Periksa kembali penulisannya.");
             return;
         }
         trackResultContainer.addView(UiRenderer.reportCard(getLayoutInflater(), trackResultContainer, report));
@@ -108,7 +123,7 @@ public class ReportActivity extends BaseActivity {
 
     private void onUpdateReportStatus(ViolationReport report, ReportStatus status) {
         if (reportService.updateReportStatus(report.getReportId(), status)) {
-            toast(report.getTicketCode() + " → " + status.getLabel());
+            toast(report.getTicketCode() + ": " + status.getLabel());
             renderAllReports();
         }
     }

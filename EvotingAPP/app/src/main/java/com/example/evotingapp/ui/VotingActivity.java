@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -26,9 +27,10 @@ public class VotingActivity extends BaseActivity {
     private Voter voter;
 
     private LinearLayout candidatesContainer;
-    private TextView tvVotingInfo;
+    private TextView tvHeaderSubtitle;
     private View receiptCard;
     private TextView tvReceipt;
+    private String receiptHash;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,12 +46,13 @@ public class VotingActivity extends BaseActivity {
         }
         voter = (Voter) user;
         setContentView(R.layout.activity_voting);
+        setupHeader("Bilik suara", "");
 
         votingService = container().votingService();
         candidateService = container().candidateService();
 
+        tvHeaderSubtitle = findViewById(R.id.tvHeaderSubtitle);
         candidatesContainer = findViewById(R.id.candidatesContainer);
-        tvVotingInfo = findViewById(R.id.tvVotingInfo);
         receiptCard = findViewById(R.id.receiptCard);
         tvReceipt = findViewById(R.id.tvReceipt);
 
@@ -59,15 +62,20 @@ public class VotingActivity extends BaseActivity {
         render();
     }
 
+    private void setHint(String text) {
+        tvHeaderSubtitle.setText(text);
+        tvHeaderSubtitle.setVisibility(View.VISIBLE);
+    }
+
     private void render() {
         ElectionState state = container().electionService().getState();
         boolean canVote = state == ElectionState.OPEN && voter.canCastVote();
         if (state != ElectionState.OPEN) {
-            tvVotingInfo.setText("Pemungutan suara belum/tidak dibuka (" + state.getLabel() + ").");
+            setHint("Bilik suara belum bisa dipakai. Status saat ini: " + state.getLabel().toLowerCase() + ".");
         } else if (!voter.canCastVote()) {
-            tvVotingInfo.setText("Anda sudah menggunakan hak pilih. Terima kasih telah berpartisipasi.");
+            setHint("Anda sudah menggunakan hak pilih. Terima kasih sudah ikut memilih.");
         } else {
-            tvVotingInfo.setText("Pilih satu pasangan. Suara dienkripsi AES dan tidak disimpan bersama identitas Anda.");
+            setHint("Coblos satu pasangan calon. Pilihan dienkripsi dan disimpan tanpa identitas Anda.");
         }
 
         candidatesContainer.removeAllViews();
@@ -76,41 +84,72 @@ public class VotingActivity extends BaseActivity {
             View card = UiRenderer.candidateCard(inflater, candidatesContainer, c);
             View choose = card.findViewById(R.id.btnChoose);
             choose.setVisibility(canVote ? View.VISIBLE : View.GONE);
-            choose.setOnClickListener(v -> confirmVote(c));
+            choose.setContentDescription("Coblos " + c.getFullName());
+            choose.setOnClickListener(v -> confirmVote(card, c));
             candidatesContainer.addView(card);
         }
     }
 
-    private void confirmVote(Candidate candidate) {
+    /** Menandai kartu dengan bekas coblosan, lalu meminta konfirmasi. */
+    private void confirmVote(View card, Candidate candidate) {
+        View punch = card.findViewById(R.id.punchMark);
+        punch.setScaleX(0.4f);
+        punch.setScaleY(0.4f);
+        punch.setVisibility(View.VISIBLE);
+        punch.animate().scaleX(1f).scaleY(1f).setDuration(180)
+                .setInterpolator(new DecelerateInterpolator()).start();
+
         new MaterialAlertDialogBuilder(this)
-                .setTitle("Konfirmasi Pilihan")
-                .setMessage("Anda memilih:\n\n" + candidate.getFullName()
-                        + "\n\nSuara tidak dapat diubah setelah dikirim.")
+                .setTitle("Coblos pasangan ini?")
+                .setMessage(candidate.getFullName() + "\n\nPilihan tidak bisa diubah setelah suara dikirim.")
                 .setNegativeButton("Batal", null)
-                .setPositiveButton("Kirim Suara", (d, w) -> onCandidateSelected(candidate.getCandidateId()))
+                .setPositiveButton("Kirim suara", (d, w) -> onCandidateSelected(candidate.getCandidateId()))
+                .setOnDismissListener(d -> {
+                    if (receiptHash == null) {
+                        punch.setVisibility(View.GONE);
+                    }
+                })
                 .show();
     }
 
     private void onCandidateSelected(String candidateId) {
         try {
-            String receipt = votingService.castVote(voter, candidateId);
-            showReceipt(receipt);
+            receiptHash = votingService.castVote(voter, candidateId);
+            showReceipt(receiptHash);
         } catch (ElectionException e) {
             showMessage("Suara tidak terkirim", e.getMessage());
             render();
         }
     }
 
-    private void showReceipt(String receiptHash) {
-        tvReceipt.setText(receiptHash);
-        receiptCard.setVisibility(View.VISIBLE);
+    private void showReceipt(String hash) {
+        tvReceipt.setText(groupHash(hash));
         candidatesContainer.setVisibility(View.GONE);
-        tvVotingInfo.setText("Terima kasih telah menggunakan hak pilih Anda.");
+        setHint("Terima kasih sudah menggunakan hak pilih Anda.");
+
+        // Satu momen gerak: struk muncul dari bawah.
+        receiptCard.setAlpha(0f);
+        receiptCard.setTranslationY(UiRenderer.dp(this, 48));
+        receiptCard.setVisibility(View.VISIBLE);
+        receiptCard.animate().alpha(1f).translationY(0f).setDuration(380)
+                .setInterpolator(new DecelerateInterpolator()).start();
+    }
+
+    /** Memecah hash 64 karakter menjadi 4 baris berisi 4 kelompok agar mudah dicocokkan. */
+    private static String groupHash(String hash) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < hash.length(); i += 4) {
+            if (i > 0) {
+                sb.append(i % 16 == 0 ? '\n' : ' ');
+            }
+            sb.append(hash, i, Math.min(i + 4, hash.length()));
+        }
+        return sb.toString();
     }
 
     private void copyReceipt() {
         ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        cm.setPrimaryClip(ClipData.newPlainText("Receipt Hash", tvReceipt.getText()));
-        toast("Receipt Hash disalin.");
+        cm.setPrimaryClip(ClipData.newPlainText("Receipt Hash", receiptHash));
+        toast("Receipt Hash disalin");
     }
 }

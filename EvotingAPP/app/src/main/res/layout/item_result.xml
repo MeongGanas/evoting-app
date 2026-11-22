@@ -3,12 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="12dp"
+    android:layout_marginTop="16dp"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="bottom"
         android:orientation="horizontal">
 
         <TextView
@@ -16,16 +17,18 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="@color/text_primary"
+            android:textSize="15sp"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/tvVotes"
+            android:id="@+id/tvPercent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:fontFamily="sans-serif-condensed"
             android:textColor="@color/brand_primary"
+            android:textSize="22sp"
             android:textStyle="bold" />
     </LinearLayout>
 
@@ -33,8 +36,16 @@
         android:id="@+id/progress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="6dp"
         android:max="1000"
-        app:trackCornerRadius="4dp"
-        app:trackThickness="10dp" />
+        app:trackColor="@color/brand_primary_container"
+        app:trackCornerRadius="6dp"
+        app:trackThickness="12dp" />
+
+    <TextView
+        android:id="@+id/tvVotes"
+        style="@style/MutedText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp" />
 </LinearLayout>

@@ -1,198 +1,295 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tvGreeting"
+        <!-- Header: sapaan + siklus pemilu -->
+        <LinearLayout
+            android:id="@+id/header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="?attr/textAppearanceHeadlineSmall"
-            android:textColor="@color/brand_primary"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tvRole"
-            style="@style/MutedText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:id="@+id/tvElectionState"
-            style="@style/Badge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp" />
-
-        <!-- Menu sesuai peran -->
-        <com.google.android.material.card.MaterialCardView
-            style="@style/SectionCard"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:background="@drawable/bg_header"
+            android:orientation="vertical"
+            android:paddingStart="20dp"
+            android:paddingTop="24dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="28dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-                <TextView
-                    style="@style/SectionTitle"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Menu" />
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnVote"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Masuk Bilik Suara" />
+                    <TextView
+                        android:id="@+id/tvGreeting"
+                        style="@style/TextHeaderTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnPanwas"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Dashboard Pengawas" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnKpu"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Dashboard Panitia &amp; Buka Kotak" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnReport"
-                    style="@style/Widget.Material3.Button.TonalButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Laporan Pelanggaran" />
+                    <TextView
+                        android:id="@+id/tvRole"
+                        style="@style/TextOnInk"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnLogout"
                     style="@style/Widget.Material3.Button.TextButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Keluar" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Hasil rekapitulasi -->
-        <com.google.android.material.card.MaterialCardView
-            style="@style/SectionCard"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    style="@style/SectionTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Hasil Rekapitulasi" />
+                    android:text="Keluar"
+                    android:textColor="@color/on_ink_muted" />
+            </LinearLayout>
+
+            <!-- Stepper siklus pemilu: garis di belakang, titik di depan -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginTop="7dp"
+                    android:layout_marginEnd="40dp"
+                    android:background="@color/on_ink_faint" />
+
+                <LinearLayout
+                    android:id="@+id/lifecycleRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/tvStateHint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:textColor="@color/white"
+                android:textSize="15sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="24dp">
+
+            <!-- Aksi utama sesuai peran -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnVote"
+                style="@style/Button.Big"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Masuk bilik suara" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPanwas"
+                style="@style/Button.Big"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Periksa kotak suara" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnKpu"
+                style="@style/Button.Big"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Kelola pemilu" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnReport"
+                style="@style/MenuRow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Laporan pelanggaran"
+                            android:textColor="@color/text_primary"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvReportDesc"
+                            style="@style/MutedText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Laporkan kecurangan, boleh tanpa identitas" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_chevron_right" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Hasil -->
+            <TextView
+                style="@style/SectionTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:text="Hasil rekapitulasi" />
+
+            <LinearLayout
+                android:id="@+id/resultsLocked"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_ballot_number"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/ivResultsLock"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/bg_status_circle"
+                    android:backgroundTint="@color/brand_primary"
+                    android:importantForAccessibility="no"
+                    android:padding="9dp"
+                    android:src="@drawable/ic_lock"
+                        android:tint="@color/on_accent" />
 
                 <TextView
                     android:id="@+id/tvResultsInfo"
-                    style="@style/MutedText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    style="@style/BodyText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_weight="1"
+                    android:textColor="@color/brand_on_primary_container" />
+            </LinearLayout>
 
-                <LinearLayout
-                    android:id="@+id/resultsContainer"
+            <LinearLayout
+                android:id="@+id/resultsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <!-- Cek struk -->
+            <TextView
+                style="@style/SectionTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="Cek struk suara" />
+
+            <TextView
+                style="@style/MutedText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Tempel Receipt Hash dari struk Anda. Struk hanya membuktikan suara Anda ada di kotak suara, bukan siapa yang Anda pilih." />
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:hint="Receipt Hash"
+                app:endIconMode="clear_text">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/inputReceipt"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Verifikasi receipt -->
-        <com.google.android.material.card.MaterialCardView
-            style="@style/SectionCard"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+                    android:fontFamily="monospace"
+                    android:inputType="textVisiblePassword|textNoSuggestions"
+                    android:textSize="13sp" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    style="@style/SectionTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Verifikasi Receipt Hash" />
-
-                <TextView
-                    style="@style/MutedText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Tempel struk Receipt Hash untuk memastikan suara Anda tercatat di kotak suara." />
-
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:hint="Receipt Hash (64 karakter)">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/inputReceipt"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="monospace"
-                        android:inputType="text"
-                        android:textSize="13sp" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnVerify"
-                    style="@style/Widget.Material3.Button.TonalButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Verifikasi" />
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/tvVerifyResult"
                     style="@style/Badge"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:visibility="invisible" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnVerify"
+                    style="@style/Widget.Material3.Button.TonalButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:visibility="gone" />
+                    android:text="Cek struk" />
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
 
-        <!-- Kandidat & dana -->
-        <TextView
-            style="@style/SectionTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="Kandidat &amp; Laporan Dana Kampanye" />
+            <!-- Kandidat -->
+            <TextView
+                style="@style/SectionTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="Kandidat dan dana kampanye" />
 
-        <LinearLayout
-            android:id="@+id/candidatesContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" />
+            <TextView
+                style="@style/MutedText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Visi, misi, dan sumber dana dilaporkan oleh panitia." />
 
-        <TextView
-            android:id="@+id/tvBallotCount"
-            style="@style/MutedText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:gravity="center" />
+            <LinearLayout
+                android:id="@+id/candidatesContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <TextView
+                android:id="@+id/tvBallotCount"
+                style="@style/MutedText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="center" />
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>

@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="14dp">
+        android:padding="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -22,6 +22,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:fontFamily="monospace"
+                android:textColor="@color/brand_primary"
+                android:textSize="15sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -32,24 +34,24 @@
         </LinearLayout>
 
         <TextView
+            android:id="@+id/tvDescription"
+            style="@style/BodyText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" />
+
+        <TextView
             android:id="@+id/tvMeta"
             style="@style/MutedText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" />
-
-        <TextView
-            android:id="@+id/tvDescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:textAppearance="?attr/textAppearanceBodyMedium" />
+            android:layout_marginTop="6dp" />
 
         <LinearLayout
             android:id="@+id/actionRow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="10dp"
             android:orientation="horizontal"
             android:visibility="gone">
 
@@ -59,8 +61,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Tinjau"
-                android:textSize="12sp" />
+                android:text="Tinjau" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnResolve"
@@ -69,8 +70,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1"
-                android:text="Selesai"
-                android:textSize="12sp" />
+                android:text="Selesai" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnReject"
@@ -80,7 +80,7 @@
                 android:layout_marginStart="6dp"
                 android:layout_weight="1"
                 android:text="Tolak"
-                android:textSize="12sp" />
+                android:textColor="@color/status_danger" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

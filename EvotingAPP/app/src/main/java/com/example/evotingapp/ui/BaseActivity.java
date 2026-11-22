@@ -3,6 +3,7 @@ package com.example.evotingapp.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -16,30 +17,55 @@ import com.example.evotingapp.R;
 import com.example.evotingapp.role.User;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-/** Kebutuhan umum semua layar: akses container, sesi login, inset layar, dan pesan. */
+/** Kebutuhan umum semua layar: akses container, sesi login, inset layar, header, dan pesan. */
 public abstract class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         WindowCompat.enableEdgeToEdge(getWindow());
+        // Header berwarna ungu tinta: ikon status bar dibuat terang.
+        WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView())
+                .setAppearanceLightStatusBars(false);
     }
 
     @Override
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
         View root = findViewById(R.id.root);
-        if (root != null) {
-            final int l = root.getPaddingLeft();
-            final int t = root.getPaddingTop();
-            final int r = root.getPaddingRight();
-            final int b = root.getPaddingBottom();
-            ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
-                Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars()
-                        | WindowInsetsCompat.Type.ime());
-                v.setPadding(l + bars.left, t + bars.top, r + bars.right, b + bars.bottom);
-                return insets;
-            });
+        View header = findViewById(R.id.header);
+        if (root == null) {
+            return;
+        }
+        final int rl = root.getPaddingLeft();
+        final int rt = root.getPaddingTop();
+        final int rr = root.getPaddingRight();
+        final int rb = root.getPaddingBottom();
+        final int ht = header == null ? 0 : header.getPaddingTop();
+        ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
+            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars()
+                    | WindowInsetsCompat.Type.ime());
+            if (header != null) {
+                // Header ungu memanjang sampai di belakang status bar.
+                header.setPadding(header.getPaddingLeft(), ht + bars.top,
+                        header.getPaddingRight(), header.getPaddingBottom());
+                v.setPadding(rl + bars.left, rt, rr + bars.right, rb + bars.bottom);
+            } else {
+                v.setPadding(rl + bars.left, rt + bars.top, rr + bars.right, rb + bars.bottom);
+            }
+            return insets;
+        });
+    }
+
+    /** Mengisi header standar (view_header.xml) pada layar turunan. */
+    protected void setupHeader(String title, String subtitle) {
+        ((TextView) findViewById(R.id.tvHeaderTitle)).setText(title);
+        TextView sub = findViewById(R.id.tvHeaderSubtitle);
+        sub.setText(subtitle);
+        sub.setVisibility(subtitle == null || subtitle.isEmpty() ? View.GONE : View.VISIBLE);
+        View back = findViewById(R.id.btnBack);
+        if (back != null) {
+            back.setOnClickListener(v -> finish());
         }
     }
 
@@ -72,7 +98,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         new MaterialAlertDialogBuilder(this)
                 .setTitle(title)
                 .setMessage(message)
-                .setPositiveButton("OK", null)
+                .setPositiveButton("Mengerti", null)
                 .show();
     }
 }

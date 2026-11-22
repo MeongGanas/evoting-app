@@ -1,5 +1,6 @@
 package com.example.evotingapp.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 
 import com.example.evotingapp.R;
 import com.example.evotingapp.model.Candidate;
+import com.example.evotingapp.model.ElectionState;
 import com.example.evotingapp.model.TallyResult;
 import com.example.evotingapp.role.IElectionManager;
 import com.example.evotingapp.role.User;
@@ -38,12 +40,11 @@ public class KpuActivity extends BaseActivity {
     private EditText inputPanwasPin;
     private LinearLayout candidatesContainer;
     private LinearLayout resultsContainer;
+    private View candidateForm;
+    private TextView btnToggleCandidateForm;
+    private TextView tvStateHint;
     private VoterRegistryService voterRegistryService;
-    private EditText inputVoterNik;
-    private EditText inputVoterUsername;
-    private EditText inputVoterPassword;
     private TextView tvDptSummary;
-    private LinearLayout votersContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +59,11 @@ public class KpuActivity extends BaseActivity {
             return;
         }
         setContentView(R.layout.activity_kpu);
+        setupHeader("Panitia pemilu", "Siapkan kandidat dan pemilih, jalankan pemungutan suara, lalu buka kotak suara bersama pengawas.");
+        candidateForm = findViewById(R.id.candidateForm);
+        btnToggleCandidateForm = findViewById(R.id.btnToggleCandidateForm);
+        btnToggleCandidateForm.setOnClickListener(v -> setCandidateFormOpen(candidateForm.getVisibility() != View.VISIBLE));
+        tvStateHint = findViewById(R.id.tvStateHint);
 
         AppContainer c = container();
         candidateService = c.candidateService();
@@ -74,70 +80,37 @@ public class KpuActivity extends BaseActivity {
         inputPanwasPin = findViewById(R.id.inputPanwasPin);
         candidatesContainer = findViewById(R.id.candidatesContainer);
         resultsContainer = findViewById(R.id.resultsContainer);
-        inputVoterNik = findViewById(R.id.inputVoterNik);
-        inputVoterUsername = findViewById(R.id.inputVoterUsername);
-        inputVoterPassword = findViewById(R.id.inputVoterPassword);
         tvDptSummary = findViewById(R.id.tvDptSummary);
-        votersContainer = findViewById(R.id.votersContainer);
         voterRegistryService = c.voterRegistryService();
 
         findViewById(R.id.btnOpenElection).setOnClickListener(v -> runAction(electionService::openElection,
-                "Pemungutan suara dibuka."));
+                "Pemungutan suara dibuka"));
         findViewById(R.id.btnCloseElection).setOnClickListener(v -> runAction(electionService::closeElection,
-                "Pemungutan suara ditutup."));
+                "Pemungutan suara ditutup"));
         findViewById(R.id.btnSaveCandidate).setOnClickListener(v -> onSaveCandidate());
         findViewById(R.id.btnUnlock).setOnClickListener(v -> onUnlockBallotBox());
         findViewById(R.id.btnResetDemo).setOnClickListener(v -> onResetDemo());
-        findViewById(R.id.btnRegisterVoter).setOnClickListener(v -> onRegisterVoter());
-
-        refresh();
+        findViewById(R.id.btnOpenVoters).setOnClickListener(v ->
+                startActivity(new Intent(this, VoterRegistryActivity.class)));
     }
 
-    private void onRegisterVoter() {
-        try {
-            Voter voter = voterRegistryService.registerVoter(
-                    inputVoterNik.getText().toString(),
-                    inputVoterUsername.getText().toString(),
-                    inputVoterPassword.getText().toString());
-            inputVoterNik.setText("");
-            inputVoterUsername.setText("");
-            inputVoterPassword.setText("");
-            showMessage("Pemilih Terdaftar",
-                    "Username: " + voter.getUsername() + "\nNIK: " + maskNik(voter.getNik())
-                            + "\n\nSerahkan username dan password awal kepada pemilih.");
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (tvDptSummary != null) {
             refresh();
-        } catch (ElectionException e) {
-            showMessage("Pendaftaran Ditolak", e.getMessage());
         }
     }
 
-    private void renderVoters() {
+    private void renderVoterSummary() {
         List<Voter> voters = voterRegistryService.getAllVoters();
         int voted = 0;
-        votersContainer.removeAllViews();
-        LayoutInflater inflater = getLayoutInflater();
         for (Voter v : voters) {
-            View row = inflater.inflate(R.layout.item_voter, votersContainer, false);
-            ((TextView) row.findViewById(R.id.tvUsername)).setText(v.getUsername());
-            ((TextView) row.findViewById(R.id.tvNik)).setText("NIK " + maskNik(v.getNik()));
-            boolean hasVoted = !v.canCastVote();
-            if (hasVoted) {
+            if (!v.canCastVote()) {
                 voted++;
             }
-            UiRenderer.setBadge(row.findViewById(R.id.tvVoteStatus),
-                    hasVoted ? "Sudah memilih" : "Belum memilih",
-                    hasVoted ? UiRenderer.Tone.SUCCESS : UiRenderer.Tone.NEUTRAL);
-            votersContainer.addView(row);
         }
-        tvDptSummary.setText("Total DPT: " + voters.size() + " · Sudah memilih: " + voted);
-    }
-
-    /** Menyamarkan NIK agar data pribadi tidak tampil utuh di layar. */
-    private static String maskNik(String nik) {
-        if (nik == null || nik.length() < 8) {
-            return "-";
-        }
-        return nik.substring(0, 4) + "********" + nik.substring(nik.length() - 4);
+        tvDptSummary.setText(voters.size() + " pemilih terdaftar, " + voted + " sudah memilih");
     }
 
     private interface Action {
@@ -150,14 +123,21 @@ public class KpuActivity extends BaseActivity {
                 toast(successMessage);
             }
         } catch (ElectionException e) {
-            showMessage("Tidak dapat diproses", e.getMessage());
+            showMessage("Status belum berubah", e.getMessage());
         }
         refresh();
     }
 
+    private void setCandidateFormOpen(boolean open) {
+        candidateForm.setVisibility(open ? View.VISIBLE : View.GONE);
+        btnToggleCandidateForm.setText(open ? "Tutup formulir" : "Tambah kandidat");
+    }
+
     private void refresh() {
-        UiRenderer.setElectionBadge(tvElectionState, electionService.getState());
-        renderVoters();
+        ElectionState state = electionService.getState();
+        UiRenderer.setElectionBadge(tvElectionState, state);
+        tvStateHint.setText(UiRenderer.describe(state));
+        renderVoterSummary();
         List<TallyResult> results = tallyService.getPublishedResults();
         UiRenderer.renderResults(getLayoutInflater(), resultsContainer, results);
 
@@ -176,8 +156,9 @@ public class KpuActivity extends BaseActivity {
         inputCandVision.setText(c.getVisionMission());
         inputCandFund.setText(String.valueOf((long) c.getCampaignFundAmount()));
         inputCandFundSummary.setText(c.getFundSummary());
-        inputCandId.requestFocus();
-        toast("Mengubah " + c.getCandidateId());
+        setCandidateFormOpen(true);
+        inputCandName.requestFocus();
+        toast("Mengubah kandidat " + c.getCandidateId());
     }
 
     private void onSaveCandidate() {
@@ -197,11 +178,12 @@ public class KpuActivity extends BaseActivity {
                 inputCandFundSummary.getText().toString().trim());
         try {
             if (candidateService.saveCandidate(candidate)) {
-                toast("Kandidat disimpan.");
+                toast("Kandidat disimpan");
                 for (EditText e : new EditText[]{inputCandId, inputCandName, inputCandVision,
                         inputCandFund, inputCandFundSummary}) {
                     e.setText("");
                 }
+                setCandidateFormOpen(false);
                 refresh();
             }
         } catch (ElectionException e) {
@@ -215,22 +197,22 @@ public class KpuActivity extends BaseActivity {
                     inputKpuPin.getText().toString(), inputPanwasPin.getText().toString());
             inputKpuPin.setText("");
             inputPanwasPin.setText("");
-            showMessage("Kotak Suara Dibuka",
-                    "Tamper Check lolos. " + results.size() + " hasil kandidat dipublikasikan ke Papan Transparansi.");
+            showMessage("Kotak suara dibuka",
+                    "Rantai hash utuh. Hasil " + results.size() + " pasangan calon sudah diumumkan di papan transparansi.");
         } catch (ElectionException e) {
-            showMessage("Buka Kotak Gagal", e.getMessage());
+            showMessage("Kotak suara tidak dapat dibuka", e.getMessage());
         }
         refresh();
     }
 
     private void onResetDemo() {
         new MaterialAlertDialogBuilder(this)
-                .setTitle("Reset Data Demo")
-                .setMessage("Semua suara, laporan, hasil, dan perubahan kandidat akan dihapus dan dikembalikan ke data awal. Lanjutkan?")
+                .setTitle("Reset data demo?")
+                .setMessage("Semua suara, laporan, hasil, pemilih baru, dan perubahan kandidat akan dihapus. Data kembali seperti saat aplikasi pertama dipasang.")
                 .setNegativeButton("Batal", null)
-                .setPositiveButton("Reset", (d, w) -> {
+                .setPositiveButton("Reset data", (d, w) -> {
                     container().dbHelper().resetDemoData();
-                    toast("Data demo dikembalikan ke awal.");
+                    toast("Data demo dikembalikan ke awal");
                     goToLogin();
                 })
                 .show();

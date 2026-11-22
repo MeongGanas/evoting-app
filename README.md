@@ -45,7 +45,7 @@ Aplikasi mendukung **3 peran utama** dengan data *seeding* otomatis saat databas
 
 ### Skenario Uji Cepat
 
-1. Login `kpu1` → (opsional) daftarkan pemilih baru di panel **Pendaftaran Pemilih (DPT)** → **Buka** pemungutan suara.
+1. Login `kpu1` → (opsional) daftarkan pemilih baru di halaman **Daftar Pemilih Tetap** → **Buka** pemungutan suara.
 2. Login `pemilih1` … `pemilih5` → Bilik Suara → pilih kandidat → simpan *Receipt Hash* → verifikasi di Papan Transparansi.
 3. (Opsional) Kirim laporan anonim, catat **Kode Tiket**, lalu login `panwas1` untuk mengubah statusnya.
 4. Login `kpu1` → **Tutup** → isi PIN KPU `1111` + PIN Panwas `2222` → **Buka Kotak & Hitung Suara**.
@@ -77,7 +77,7 @@ Diagram hanya memuat **fitur utama**. Bagian pendukung yang bersifat umum (layar
 
 ## Daftar Layar & Alur UI (Referensi Desain Stitch)
 
-Aplikasi dirancang dengan 6 layar utama yang bersih, bergaya modern *civic-tech*, dan ramah pengguna mobile:
+Aplikasi memakai tema gelap (latar biru-abu tua, aksen toska) dengan 7 layar utama:
 
 1. **Login Screen (`LoginActivity`)**
    - Input username & password, tombol Login, serta tombol pintas *Isi Akun Demo* (Pemilih / Panwas / KPU).
@@ -93,8 +93,11 @@ Aplikasi dirancang dengan 6 layar utama yang bersih, bergaya modern *civic-tech*
 5. **Dashboard Pengawas (`PanwasActivity`)** *(Khusus Panwas)*
    - Kartu status integritas kotak suara (Aman / *TAMPERED*), tombol **Jalankan Tamper Check**, tombol **Simulasi Manipulasi DB**, dan akses ke daftar tindak lanjut laporan.
 6. **Dashboard Panitia & Buka Kotak (`KpuActivity`)** *(Khusus KPU)*
-   - Panel **Pendaftaran Pemilih (DPT)**: input NIK 16 digit, username, dan password awal, beserta daftar DPT (NIK disamarkan) dan status sudah/belum memilih.
+   - Tautan ke halaman **Daftar Pemilih Tetap** beserta ringkasan jumlah pemilih.
    - Form tambah/edit kandidat & laporan dana kampanye, tombol **Buka / Tutup Pemungutan Suara**, serta panel **Buka Kotak Suara** yang meminta input **PIN KPU** + **PIN Panwas** untuk memicu dekripsi dan publikasi hasil.
+
+7. **Daftar Pemilih Tetap (`VoterRegistryActivity`)** *(Khusus KPU)*
+   - Ringkasan jumlah pemilih terdaftar dan yang sudah memilih, formulir pendaftaran (NIK 16 digit, username, kata sandi awal), pencarian username, dan daftar pemilih dengan NIK disamarkan serta status sudah/belum memilih.
 
 ---
 

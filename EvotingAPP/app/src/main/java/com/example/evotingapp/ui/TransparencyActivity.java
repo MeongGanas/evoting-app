@@ -1,12 +1,17 @@
 package com.example.evotingapp.ui;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
 
 import com.example.evotingapp.R;
 import com.example.evotingapp.model.Candidate;
@@ -23,14 +28,17 @@ import com.example.evotingapp.service.TallyService;
 
 import java.util.List;
 
-/** Beranda: Papan Transparansi Pemilu (kandidat, dana, hasil, verifikasi receipt). */
+/** Beranda: Papan Transparansi Pemilu (siklus, hasil, cek struk, kandidat & dana). */
 public class TransparencyActivity extends BaseActivity {
     private CandidateService candidateService;
     private TallyService tallyService;
     private BallotAuditService auditService;
     private ElectionService electionService;
 
-    private TextView tvElectionState;
+    private LinearLayout lifecycleRow;
+    private TextView tvStateHint;
+    private View resultsLocked;
+    private ImageView ivResultsLock;
     private TextView tvResultsInfo;
     private TextView tvBallotCount;
     private TextView tvVerifyResult;
@@ -54,8 +62,11 @@ public class TransparencyActivity extends BaseActivity {
         electionService = c.electionService();
 
         ((TextView) findViewById(R.id.tvGreeting)).setText("Halo, " + user.getUsername());
-        ((TextView) findViewById(R.id.tvRole)).setText("Masuk sebagai " + user.getRoleLabel());
-        tvElectionState = findViewById(R.id.tvElectionState);
+        ((TextView) findViewById(R.id.tvRole)).setText(user.getRoleLabel());
+        lifecycleRow = findViewById(R.id.lifecycleRow);
+        tvStateHint = findViewById(R.id.tvStateHint);
+        resultsLocked = findViewById(R.id.resultsLocked);
+        ivResultsLock = findViewById(R.id.ivResultsLock);
         tvResultsInfo = findViewById(R.id.tvResultsInfo);
         tvBallotCount = findViewById(R.id.tvBallotCount);
         tvVerifyResult = findViewById(R.id.tvVerifyResult);
@@ -63,11 +74,14 @@ public class TransparencyActivity extends BaseActivity {
         candidatesContainer = findViewById(R.id.candidatesContainer);
         inputReceipt = findViewById(R.id.inputReceipt);
 
-        // Menu tampil sesuai kemampuan peran (interface hak akses).
+        // Aksi utama tampil sesuai kemampuan peran (interface hak akses).
         setupMenu(R.id.btnVote, user instanceof IVotable, VotingActivity.class);
         setupMenu(R.id.btnPanwas, user instanceof IAuditCapable, PanwasActivity.class);
         setupMenu(R.id.btnKpu, user instanceof IElectionManager, KpuActivity.class);
         setupMenu(R.id.btnReport, true, ReportActivity.class);
+        if (user instanceof IAuditCapable) {
+            ((TextView) findViewById(R.id.tvReportDesc)).setText("Tinjau dan tindak lanjuti laporan masuk");
+        }
         findViewById(R.id.btnLogout).setOnClickListener(v -> goToLogin());
         findViewById(R.id.btnVerify).setOnClickListener(v -> onVerifyReceipt());
     }
@@ -81,10 +95,10 @@ public class TransparencyActivity extends BaseActivity {
         }
     }
 
-    private void setupMenu(int buttonId, boolean visible, Class<?> target) {
-        View button = findViewById(buttonId);
-        button.setVisibility(visible ? View.VISIBLE : View.GONE);
-        button.setOnClickListener(v -> startActivity(new Intent(this, target)));
+    private void setupMenu(int viewId, boolean visible, Class<?> target) {
+        View view = findViewById(viewId);
+        view.setVisibility(visible ? View.VISIBLE : View.GONE);
+        view.setOnClickListener(v -> startActivity(new Intent(this, target)));
     }
 
     private void showCandidates() {
@@ -97,19 +111,24 @@ public class TransparencyActivity extends BaseActivity {
 
     private void showResults() {
         ElectionState state = electionService.getState();
-        UiRenderer.setElectionBadge(tvElectionState, state);
-        tvBallotCount.setText("Surat suara tercatat: " + auditService.countBallots());
+        UiRenderer.renderLifecycle(lifecycleRow, state);
+        tvStateHint.setText(UiRenderer.describe(state));
+        int count = auditService.countBallots();
+        tvBallotCount.setText(count + " surat suara tercatat di kotak suara");
 
         List<TallyResult> results = tallyService.getPublishedResults();
         if (results.isEmpty()) {
             resultsContainer.removeAllViews();
-            if (state == ElectionState.TAMPERED) {
-                tvResultsInfo.setText("Rekapitulasi dibekukan karena kotak suara terindikasi manipulasi.");
-            } else {
-                tvResultsInfo.setText("🔒 Hasil terkunci sampai kotak suara dibuka dengan PIN KPU dan PIN Panwas.");
-            }
+            resultsLocked.setVisibility(View.VISIBLE);
+            boolean frozen = state == ElectionState.TAMPERED;
+            int tint = ContextCompat.getColor(this, frozen ? R.color.status_danger : R.color.brand_primary);
+            ViewCompat.setBackgroundTintList(ivResultsLock, ColorStateList.valueOf(tint));
+            ivResultsLock.setImageResource(frozen ? R.drawable.ic_alert : R.drawable.ic_lock);
+            tvResultsInfo.setText(frozen
+                    ? "Rekapitulasi dibekukan. Pengawas sedang mengaudit kotak suara."
+                    : "Hasil masih terkunci. Kotak suara hanya bisa dibuka dengan PIN KPU dan PIN Panwas setelah pemungutan ditutup.");
         } else {
-            tvResultsInfo.setText("Hasil resmi setelah dekripsi dan Tamper Check.");
+            resultsLocked.setVisibility(View.GONE);
             UiRenderer.renderResults(getLayoutInflater(), resultsContainer, results);
         }
     }
@@ -117,14 +136,13 @@ public class TransparencyActivity extends BaseActivity {
     private void onVerifyReceipt() {
         String receipt = inputReceipt.getText().toString();
         if (receipt.trim().isEmpty()) {
-            toast("Masukkan Receipt Hash terlebih dahulu.");
+            toast("Tempel Receipt Hash dari struk Anda terlebih dahulu.");
             return;
         }
         if (auditService.verifyReceipt(receipt)) {
-            UiRenderer.setBadge(tvVerifyResult, "✓ Ditemukan: suara tercatat di kotak suara",
-                    UiRenderer.Tone.SUCCESS);
+            UiRenderer.setBadge(tvVerifyResult, "Tercatat di kotak suara", UiRenderer.Tone.SUCCESS);
         } else {
-            UiRenderer.setBadge(tvVerifyResult, "✗ Tidak ditemukan", UiRenderer.Tone.DANGER);
+            UiRenderer.setBadge(tvVerifyResult, "Tidak ditemukan", UiRenderer.Tone.DANGER);
         }
     }
 }
