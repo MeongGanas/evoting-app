@@ -1,0 +1,893 @@
+<title>EvotingAPP Prototipe</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@700&family=Roboto+Mono:wght@400;700&display=swap">
+<style>
+/* Layout: satu kolom selebar ponsel di tengah layar, meniru aplikasi Android EvotingAPP (tema gelap, aksen toska). */
+:root {
+  color-scheme: dark;
+  --page: #0A0F15;
+  --bg: #121A24;
+  --header: #0D131B;
+  --surface: #1C2633;
+  --surface-high: #243142;
+  --text: #E8EEF5;
+  --muted: #93A1B3;
+  --faint: #34445A;
+  --line: #2E3B4D;
+  --accent: #26C6A6;
+  --on-accent: #06241E;
+  --accent-box: #123A34;
+  --on-accent-box: #9AF2DE;
+  --ok: #4ADE9B;  --ok-bg: #123327;
+  --bad: #FF7A7A; --bad-bg: #3A1C22;
+  --warn: #FBC15A; --warn-bg: #382C14;
+  --neutral: #B4C0CF; --neutral-bg: #263243;
+  --font-body: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-head: "Roboto Condensed", "Arial Narrow", "Roboto", sans-serif;
+  --font-mono: "Roboto Mono", ui-monospace, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--page); color: var(--text); font-family: var(--font-body); font-size: 15px; line-height: 1.4; }
+button, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---------- bingkai prototipe ---------- */
+.proto-bar {
+  max-width: 420px; margin: 0 auto;
+  display: flex; align-items: center; gap: 12px; justify-content: space-between;
+  padding-block: 10px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  color: var(--muted); font-size: 12.5px;
+}
+.proto-bar b { color: var(--text); font-weight: 500; }
+.proto-bar button { background: none; border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; color: var(--muted); font-size: 12.5px; }
+.device {
+  max-width: 420px; margin: 0 auto 24px; background: var(--bg);
+  min-height: 760px; position: relative; overflow: hidden;
+  border-radius: 24px; border: 1px solid var(--line);
+}
+@media (max-width: 440px) {
+  .device { border-radius: 0; border-left: 0; border-right: 0; margin-bottom: 0; }
+}
+.screen { padding-bottom: 24px; }
+.content { padding: 0 16px; display: flex; flex-direction: column; }
+
+/* ---------- header ---------- */
+.header {
+  background: var(--header);
+  border-radius: 0 0 28px 28px;
+  padding: 8px 20px 28px 12px;
+}
+.header.home { padding: 24px 20px 28px; }
+.header.brand { padding: 32px 24px 56px; }
+.back { width: 48px; height: 48px; border: 0; border-radius: 50%; background: none; display: grid; place-items: center; }
+.back:hover { background: rgba(255,255,255,.06); }
+.h-title { font-family: var(--font-head); font-weight: 700; font-size: 26px; line-height: 1.15; margin: 4px 0 0 8px; text-wrap: balance; }
+.h-sub { color: var(--muted); font-size: 14px; line-height: 1.35; margin: 4px 0 0 8px; }
+.h-badge { margin: 12px 0 0 8px; }
+.brand-row { display: flex; align-items: center; gap: 10px; font-family: var(--font-head); font-weight: 700; font-size: 18px; }
+.dot { width: 14px; height: 14px; border-radius: 50%; background: var(--accent); }
+.display { font-family: var(--font-head); font-weight: 700; font-size: 30px; line-height: 1.1; margin: 28px 0 0; letter-spacing: -0.01em; text-wrap: balance; }
+.lead { color: var(--muted); font-size: 14px; line-height: 1.45; margin: 12px 0 0; }
+
+/* stepper siklus pemilu */
+.stepper { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 24px; }
+.stepper::before { content: ""; position: absolute; left: 12.5%; right: 12.5%; top: 7px; height: 2px; background: var(--faint); }
+.step { display: flex; flex-direction: column; align-items: center; position: relative; }
+.step i { display: grid; place-items: center; width: 16px; height: 16px; }
+.step i::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--faint); }
+.step.done i::after { background: var(--accent); }
+.step.now i::after { width: 16px; height: 16px; background: var(--accent); }
+.step.frozen i::after { width: 16px; height: 16px; background: var(--bad); }
+.step span { font-size: 12px; padding-top: 6px; color: var(--muted); }
+.step.now span, .step.frozen span { color: var(--text); font-weight: 700; }
+.state-hint { margin: 16px 0 0; font-size: 15px; }
+
+/* ---------- tipografi ---------- */
+.sec-title { font-family: var(--font-head); font-weight: 700; font-size: 20px; margin: 0; }
+.muted { color: var(--muted); font-size: 13px; line-height: 1.4; margin: 2px 0 0; }
+.gap-28 { margin-top: 28px; }
+.gap-32 { margin-top: 32px; }
+
+/* ---------- kartu ---------- */
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; margin-top: 12px; }
+.card.lift { border: 0; box-shadow: 0 2px 6px rgba(0,0,0,.35); margin-top: -16px; position: relative; }
+.card.lift.login { margin-top: -32px; }
+.pad { padding: 20px; }
+.pad-16 { padding: 16px; }
+.row { display: flex; align-items: center; gap: 8px; }
+.grow { flex: 1; min-width: 0; }
+
+.menu-row {
+  display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+  background: var(--surface); border: 0; border-radius: 14px; padding: 16px; margin-top: 8px;
+}
+.menu-row:hover { background: var(--surface-high); }
+.menu-row strong { display: block; font-size: 16px; }
+
+/* ---------- tombol ---------- */
+.btn {
+  border: 0; border-radius: 999px; padding: 10px 20px; font-weight: 500; font-size: 14px;
+  background: var(--accent); color: var(--on-accent); min-height: 40px;
+}
+.btn.big { width: 100%; min-height: 56px; border-radius: 14px; font-size: 16px; margin-top: 16px; }
+.btn.tonal { background: var(--accent-box); color: var(--on-accent-box); }
+.btn.outline { background: none; color: var(--accent); border: 1px solid var(--line); }
+.btn.text { background: none; color: var(--accent); }
+.btn.danger-text { background: none; color: var(--bad); width: 100%; margin-top: 28px; }
+.btn[disabled] { opacity: .38; cursor: not-allowed; }
+.btn:hover:not([disabled]) { filter: brightness(1.08); }
+.btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+.btn-row.three { grid-template-columns: repeat(3, 1fr); }
+.btn-row .btn { width: 100%; }
+.logout { background: none; border: 0; color: var(--muted); font-weight: 500; padding: 10px 12px; border-radius: 999px; }
+
+/* ---------- input ---------- */
+.field { position: relative; margin-top: 12px; }
+.field input, .field textarea {
+  width: 100%; background: transparent; border: 1px solid var(--line); border-radius: 4px;
+  padding: 16px; font-size: 16px; outline: none;
+}
+.field textarea { resize: vertical; min-height: 116px; }
+.field input:focus, .field textarea:focus { border: 2px solid var(--accent); padding: 15px; }
+.field input::placeholder, .field textarea::placeholder { color: var(--muted); }
+.field .eye { position: absolute; right: 8px; top: 8px; width: 40px; height: 40px; border: 0; background: none; border-radius: 50%; display: grid; place-items: center; }
+.field .help { color: var(--muted); font-size: 12px; margin: 4px 16px 0; display: flex; justify-content: space-between; }
+.mono { font-family: var(--font-mono); }
+.err { color: var(--bad); font-size: 13px; margin: 8px 0 0; }
+
+.seg { display: grid; grid-template-columns: 1fr 1fr; margin-top: 6px; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+.seg button { border: 0; background: none; padding: 10px; color: var(--text); font-weight: 500; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--accent-box); color: var(--on-accent-box); }
+
+/* ---------- badge ---------- */
+.badge { display: inline-block; border-radius: 999px; padding: 4px 10px; font-size: 12px; font-weight: 700; background: var(--neutral-bg); color: var(--neutral); }
+.t-ok { background: var(--ok-bg); color: var(--ok); }
+.t-bad { background: var(--bad-bg); color: var(--bad); }
+.t-warn { background: var(--warn-bg); color: var(--warn); }
+.t-info { background: var(--accent-box); color: var(--accent); }
+
+/* ---------- kartu surat suara ---------- */
+.ballot { display: flex; gap: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 12px; margin-top: 12px; }
+.ballot.clickable { cursor: pointer; }
+.ballot.clickable:hover { border-color: var(--accent); }
+.ballot-no { width: 64px; min-height: 96px; flex: none; background: var(--accent-box); border-radius: 4px; position: relative; }
+.ballot-no b { display: block; text-align: center; margin-top: 10px; font-family: var(--font-head); font-size: 34px; color: var(--accent); }
+.punch { position: absolute; left: 50%; bottom: 12px; width: 22px; height: 22px; margin-left: -11px; border-radius: 50%; background: var(--bg); border: 3px solid var(--accent); transform: scale(.4); opacity: 0; transition: transform .18s ease-out, opacity .18s; }
+.punch.on { transform: scale(1); opacity: 1; }
+.ballot h3 { font-family: var(--font-head); font-size: 19px; margin: 0; }
+.ballot .vm { font-size: 14px; line-height: 1.4; margin: 6px 0 0; white-space: pre-line; }
+.ballot hr { border: 0; border-top: 1px solid var(--line); margin: 12px 0 10px; }
+.fund { display: flex; justify-content: space-between; gap: 8px; }
+.fund strong { color: var(--accent); font-size: 14px; }
+.ballot .btn.coblos { width: 100%; margin-top: 12px; min-height: 52px; border-radius: 10px; font-size: 16px; }
+
+/* ---------- hasil ---------- */
+.locked { display: flex; align-items: center; gap: 14px; background: var(--accent-box); border-radius: 4px; padding: 16px; margin-top: 10px; color: var(--on-accent-box); }
+.ic-circle { width: 40px; height: 40px; flex: none; border-radius: 50%; display: grid; place-items: center; background: var(--accent); }
+.ic-circle.big { width: 56px; height: 56px; }
+.ic-circle.xl { width: 64px; height: 64px; }
+.result { margin-top: 16px; }
+.result .top { display: flex; align-items: flex-end; gap: 8px; }
+.result .top strong { flex: 1; font-size: 15px; }
+.result .pct { font-family: var(--font-head); font-size: 22px; color: var(--accent); font-variant-numeric: tabular-nums; }
+.track { height: 12px; border-radius: 6px; background: var(--accent-box); margin-top: 6px; overflow: hidden; }
+.track span { display: block; height: 100%; border-radius: 6px; background: var(--faint); }
+.track span.lead { background: var(--accent); }
+
+/* ---------- struk ---------- */
+.receipt { text-align: center; padding: 24px 0 16px; }
+.receipt .ic-circle { margin: 0 auto; }
+.receipt h2 { font-family: var(--font-head); font-size: 24px; margin: 12px 0 0; }
+.receipt .muted { padding: 0 24px; }
+.tear { border-top: 1.5px dashed var(--line); margin: 20px 0 0; }
+.receipt .lbl { text-align: left; margin: 16px 24px 0; }
+.hash { text-align: left; font-family: var(--font-mono); font-size: 15px; line-height: 1.6; letter-spacing: .04em; margin: 6px 24px 0; white-space: pre; overflow-x: auto; user-select: all; }
+.receipt .btn.big, .receipt .btn.text { width: calc(100% - 32px); }
+.slide-in { animation: slideIn .38s cubic-bezier(.2,.7,.3,1); }
+@keyframes slideIn { from { opacity: 0; transform: translateY(48px); } to { opacity: 1; transform: none; } }
+
+/* ---------- laporan ---------- */
+.ticket { background: var(--accent-box); border-radius: 4px; padding: 16px; margin-top: 12px; color: var(--on-accent-box); }
+.ticket .code { font-family: var(--font-mono); font-size: 26px; font-weight: 700; color: var(--accent); margin-top: 4px; user-select: all; }
+.report-card .head { display: flex; align-items: center; gap: 8px; }
+.report-card .code { flex: 1; font-family: var(--font-mono); font-weight: 700; color: var(--accent); }
+.report-card p { margin: 8px 0 0; }
+
+/* ---------- pengawas ---------- */
+.integrity { text-align: center; padding: 24px; }
+.integrity .ic-circle { margin: 0 auto; }
+.integrity h2 { font-family: var(--font-head); font-size: 26px; margin: 14px 0 0; }
+.demo-box { background: var(--warn-bg); border-radius: 4px; padding: 16px; margin-top: 32px; }
+.demo-box strong { color: var(--warn); }
+.demo-box .btn { width: 100%; margin-top: 8px; background: none; color: var(--warn); border: 1px solid var(--warn); }
+
+/* ---------- KPU ---------- */
+.step-head { display: flex; align-items: center; gap: 10px; }
+.step-no { width: 28px; height: 28px; flex: none; border-radius: 50%; background: var(--accent); color: var(--on-accent); display: grid; place-items: center; font-weight: 700; font-size: 14px; }
+.link-card { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 20px; margin-top: 20px; }
+.link-card:hover { background: var(--surface-high); }
+.pin-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+/* ---------- DPT ---------- */
+.stats { display: grid; grid-template-columns: 1fr 1fr; padding: 20px; }
+.stats b { display: block; font-family: var(--font-head); font-size: 34px; font-variant-numeric: tabular-nums; }
+.stats b.acc { color: var(--accent); }
+.voter-row { display: flex; align-items: center; gap: 8px; padding: 10px 0; }
+.voter-row + .voter-row { border-top: 1px solid var(--line); }
+.voter-row strong { display: block; font-size: 15px; }
+
+/* ---------- dialog & toast ---------- */
+.scrim { position: fixed; inset: 0; background: rgba(0,0,0,.55); display: grid; place-items: center; padding: 24px; z-index: 20; }
+.dialog { background: var(--surface-high); border-radius: 28px; padding: 24px; width: 100%; max-width: 340px; }
+.dialog h2 { font-size: 22px; font-weight: 400; margin: 0; }
+.dialog p { color: var(--muted); margin: 16px 0 0; white-space: pre-line; }
+.dialog .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 24px; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); width: min(388px, calc(100% - 32px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); background: var(--text); color: var(--bg); padding: 12px 16px; border-radius: 8px; font-size: 14px; z-index: 30; }
+
+@media (prefers-reduced-motion: reduce) {
+  .slide-in { animation: none; }
+  .punch { transition: none; }
+}
+</style>
+
+<div class="proto-bar">
+  <span><b>Prototipe EvotingAPP</b> untuk user testing. Data contoh, tidak tersimpan.</span>
+  <button type="button" id="restart">Mulai ulang</button>
+</div>
+
+<div class="device" id="device">
+
+  <!-- ===================== LOGIN ===================== -->
+  <section class="screen" id="s-login">
+    <div class="header brand">
+      <div class="brand-row"><span class="dot"></span>EvotingAPP</div>
+      <h1 class="display">Suara Anda dirahasiakan. Hasilnya bisa diperiksa siapa saja.</h1>
+      <p class="lead">Pemilihan elektronik dengan enkripsi AES dan rantai hash SHA-256, untuk SDG 16: perdamaian, keadilan, dan kelembagaan yang tangguh.</p>
+    </div>
+    <div class="content">
+      <form class="card lift login pad" id="login-form" autocomplete="off">
+        <h2 class="sec-title">Masuk</h2>
+        <div class="field"><input id="in-user" placeholder="Username" aria-label="Username"></div>
+        <div class="field">
+          <input id="in-pass" type="password" placeholder="Kata sandi" aria-label="Kata sandi">
+          <button type="button" class="eye" data-eye="in-pass" aria-label="Tampilkan kata sandi">
+            <svg width="24" height="24" viewBox="0 0 24 24"><path fill="#93A1B3" d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+          </button>
+        </div>
+        <p class="err" id="login-err" hidden></p>
+        <button class="btn big" type="submit">Masuk</button>
+        <p class="muted" style="margin-top:14px">Belum punya akun? Pemilih didaftarkan oleh panitia (KPU) ke Daftar Pemilih Tetap. Datangi panitia dengan membawa NIK Anda.</p>
+      </form>
+      <h2 class="sec-title gap-28">Coba sebagai</h2>
+      <p class="muted">Mengisi akun demo secara otomatis. Akun pemilih: pemilih1 sampai pemilih5, kata sandi 123456.</p>
+      <div class="btn-row three">
+        <button class="btn tonal" type="button" data-demo="pemilih1">Pemilih</button>
+        <button class="btn tonal" type="button" data-demo="panwas1">Pengawas</button>
+        <button class="btn tonal" type="button" data-demo="kpu1">Panitia</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== BERANDA ===================== -->
+  <section class="screen" id="s-home" hidden>
+    <div class="header home">
+      <div class="row">
+        <div class="grow">
+          <div class="h-title" style="margin:0" id="home-greet">Halo</div>
+          <div class="h-sub" style="margin:0" id="home-role"></div>
+        </div>
+        <button class="logout" type="button" data-go="login">Keluar</button>
+      </div>
+      <div class="stepper" id="stepper"></div>
+      <p class="state-hint" id="state-hint"></p>
+    </div>
+    <div class="content" style="padding-top:16px">
+      <button class="btn big" style="margin-top:0" type="button" id="primary-action"></button>
+      <button class="menu-row" type="button" data-go="report">
+        <span class="grow"><strong>Laporan pelanggaran</strong><span class="muted" id="report-desc">Laporkan kecurangan, boleh tanpa identitas</span></span>
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="#93A1B3" d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+      </button>
+
+      <h2 class="sec-title gap-28">Hasil rekapitulasi</h2>
+      <div id="home-results"></div>
+
+      <h2 class="sec-title gap-32">Cek struk suara</h2>
+      <p class="muted">Tempel Receipt Hash dari struk Anda. Struk hanya membuktikan suara Anda ada di kotak suara, bukan siapa yang Anda pilih.</p>
+      <div class="field"><input id="in-receipt" class="mono" style="font-size:13px" placeholder="Receipt Hash" aria-label="Receipt Hash"></div>
+      <div class="row" style="margin-top:8px">
+        <span class="grow"><span class="badge" id="verify-badge" hidden></span></span>
+        <button class="btn tonal" type="button" id="btn-verify">Cek struk</button>
+      </div>
+
+      <h2 class="sec-title gap-32">Kandidat dan dana kampanye</h2>
+      <p class="muted">Visi, misi, dan sumber dana dilaporkan oleh panitia.</p>
+      <div id="home-candidates"></div>
+      <p class="muted" style="text-align:center;margin-top:20px" id="ballot-count"></p>
+    </div>
+  </section>
+
+  <!-- ===================== BILIK SUARA ===================== -->
+  <section class="screen" id="s-vote" hidden>
+    <div class="header" data-header="Bilik suara"></div>
+    <div class="content">
+      <div id="vote-receipt"></div>
+      <div id="vote-candidates"></div>
+    </div>
+  </section>
+
+  <!-- ===================== LAPORAN ===================== -->
+  <section class="screen" id="s-report" hidden>
+    <div class="header" data-header="Laporan pelanggaran"></div>
+    <div class="content">
+      <form class="card lift pad" id="report-form">
+        <h2 class="sec-title">Kirim laporan</h2>
+        <div class="field">
+          <textarea id="in-report" maxlength="500" placeholder="Apa yang terjadi, di mana, dan kapan?" aria-label="Uraian laporan"></textarea>
+          <div class="help"><span></span><span id="report-count">0/500</span></div>
+        </div>
+        <div style="margin-top:8px;font-weight:700;font-size:14px">Identitas pelapor</div>
+        <div class="seg" role="group" aria-label="Identitas pelapor">
+          <button type="button" data-ident="anon" aria-pressed="true">Anonim</button>
+          <button type="button" data-ident="named" aria-pressed="false">Dengan nama</button>
+        </div>
+        <p class="muted" id="ident-hint" style="margin-top:6px"></p>
+        <p class="err" id="report-err" hidden></p>
+        <button class="btn big" type="submit">Kirim laporan</button>
+      </form>
+      <div id="ticket-panel"></div>
+
+      <h2 class="sec-title gap-28">Lacak laporan</h2>
+      <div class="row" style="align-items:flex-start">
+        <div class="field grow" style="margin-top:10px"><input id="in-ticket" class="mono" placeholder="Kode tiket, mis. LPR-AB12CD" aria-label="Kode tiket"></div>
+        <button class="btn tonal" type="button" id="btn-track" style="margin-top:18px">Lacak</button>
+      </div>
+      <div id="track-result"></div>
+
+      <div id="panwas-reports" hidden>
+        <h2 class="sec-title gap-28">Laporan masuk</h2>
+        <div id="report-list"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PENGAWAS ===================== -->
+  <section class="screen" id="s-panwas" hidden>
+    <div class="header" data-header="Pengawasan"></div>
+    <div class="content">
+      <div class="card lift integrity" id="integrity"></div>
+      <button class="menu-row" type="button" data-go="report" style="margin-top:12px">
+        <span class="grow"><strong>Laporan pelanggaran</strong><span class="muted">Tinjau dan perbarui status laporan</span></span>
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="#93A1B3" d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+      </button>
+      <p class="muted" style="margin:16px 4px 0">PIN Panwas dimasukkan bersama PIN KPU di perangkat panitia saat kotak suara dibuka.</p>
+      <div class="demo-box">
+        <strong>Alat bantu demo</strong>
+        <p class="muted" style="margin-top:4px">Mengubah isi surat suara pertama langsung di database tanpa memperbarui hash-nya, untuk membuktikan pemeriksaan rantai hash dapat mendeteksi manipulasi.</p>
+        <button class="btn" type="button" id="btn-tamper">Ubah data surat suara</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PANITIA (KPU) ===================== -->
+  <section class="screen" id="s-kpu" hidden>
+    <div class="header" data-header="Panitia pemilu"></div>
+    <div class="content">
+      <div class="card lift pad">
+        <div class="step-head"><span class="step-no">1</span><h2 class="sec-title grow">Kandidat dan dana kampanye</h2></div>
+        <p class="muted" style="margin-top:6px">Ketuk kartu kandidat di bawah untuk mengubahnya. Data ini tampil di papan transparansi.</p>
+        <button class="btn tonal" style="width:100%;margin-top:12px" type="button" id="btn-cand-toggle">Tambah kandidat</button>
+        <form id="cand-form" hidden>
+          <div class="field"><input id="in-cid" placeholder="ID kandidat, mis. C04" aria-label="ID kandidat"></div>
+          <div class="field"><input id="in-cname" placeholder="Nomor urut dan nama, mis. 04 - Nama &amp; Nama" aria-label="Nama kandidat"></div>
+          <div class="field"><textarea id="in-cvm" placeholder="Visi dan misi" aria-label="Visi dan misi" style="min-height:90px"></textarea></div>
+          <div class="field"><input id="in-cfund" inputmode="numeric" placeholder="Total dana kampanye (Rp)" aria-label="Total dana kampanye"></div>
+          <div class="field"><textarea id="in-csum" placeholder="Rincian sumber dana" aria-label="Rincian sumber dana" style="min-height:70px"></textarea></div>
+          <p class="err" id="cand-err" hidden></p>
+          <button class="btn big" type="submit">Simpan kandidat</button>
+        </form>
+      </div>
+      <div id="kpu-candidates"></div>
+
+      <button class="link-card" type="button" data-go="dpt">
+        <span class="step-no">2</span>
+        <span class="grow"><span class="sec-title" style="display:block">Daftar pemilih tetap</span><span class="muted" id="dpt-summary"></span></span>
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="#93A1B3" d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+      </button>
+
+      <div class="card pad" style="margin-top:20px">
+        <div class="step-head"><span class="step-no">3</span><h2 class="sec-title grow">Pemungutan suara</h2><span class="badge" id="kpu-state"></span></div>
+        <p class="muted" style="margin-top:6px" id="kpu-hint"></p>
+        <div class="btn-row">
+          <button class="btn" style="min-height:56px;border-radius:14px" type="button" id="btn-open">Buka</button>
+          <button class="btn outline" style="min-height:56px;border-radius:14px" type="button" id="btn-close">Tutup</button>
+        </div>
+      </div>
+
+      <div class="card pad" style="margin-top:20px">
+        <div class="step-head"><span class="step-no">4</span><h2 class="sec-title grow">Buka kotak suara</h2></div>
+        <p class="muted" style="margin-top:6px">Butuh dua PIN dari dua pihak. Rantai hash diperiksa dulu sebelum surat suara didekripsi dan dihitung.</p>
+        <div class="pin-row">
+          <div class="field"><input id="in-pin-kpu" type="password" inputmode="numeric" maxlength="6" placeholder="PIN KPU" aria-label="PIN KPU"></div>
+          <div class="field"><input id="in-pin-panwas" type="password" inputmode="numeric" maxlength="6" placeholder="PIN Panwas" aria-label="PIN Panwas"></div>
+        </div>
+        <button class="btn big" type="button" id="btn-unlock">Buka kotak dan hitung suara</button>
+        <div id="kpu-results"></div>
+      </div>
+
+      <button class="btn danger-text" type="button" id="btn-reset">Reset data demo untuk sesi uji berikutnya</button>
+    </div>
+  </section>
+
+  <!-- ===================== DAFTAR PEMILIH ===================== -->
+  <section class="screen" id="s-dpt" hidden>
+    <div class="header" data-header="Daftar pemilih tetap"></div>
+    <div class="content">
+      <div class="card lift stats">
+        <div><b id="dpt-total">0</b><span class="muted">pemilih terdaftar</span></div>
+        <div><b class="acc" id="dpt-voted">0</b><span class="muted">sudah memilih</span></div>
+      </div>
+      <form class="card pad" id="dpt-form">
+        <h2 class="sec-title">Daftarkan pemilih</h2>
+        <p class="muted" id="dpt-hint" style="margin-top:4px">Satu NIK hanya untuk satu akun. Daftar dikunci setelah pemungutan suara ditutup.</p>
+        <div class="field">
+          <input id="in-nik" inputmode="numeric" maxlength="16" placeholder="NIK" aria-label="NIK">
+          <div class="help"><span></span><span id="nik-count">0/16</span></div>
+        </div>
+        <div class="field">
+          <input id="in-vuser" maxlength="20" placeholder="Username" aria-label="Username">
+          <div class="help"><span>4–20 karakter: huruf kecil, angka, atau garis bawah</span></div>
+        </div>
+        <div class="field">
+          <input id="in-vpass" type="password" placeholder="Kata sandi awal" aria-label="Kata sandi awal">
+          <div class="help"><span>Minimal 6 karakter</span></div>
+        </div>
+        <button class="btn big" type="submit" id="btn-register">Daftarkan pemilih</button>
+      </form>
+      <h2 class="sec-title gap-28">Pemilih terdaftar</h2>
+      <div class="field" style="margin-top:8px"><input id="in-search" placeholder="Cari username" aria-label="Cari username"></div>
+      <div class="card" style="padding:4px 16px" id="voter-list"></div>
+      <p class="muted" style="text-align:center;margin-top:8px" id="voter-empty" hidden></p>
+    </div>
+  </section>
+
+  <div id="overlay"></div>
+</div>
+
+<script>
+(function () {
+  // ---------- data contoh ----------
+  var ICON = {
+    back: '<svg width="24" height="24" viewBox="0 0 24 24"><path fill="#E8EEF5" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>',
+    check: '<svg width="28" height="28" viewBox="0 0 24 24"><path fill="#06241E" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>',
+    lock: '<svg width="22" height="22" viewBox="0 0 24 24"><path fill="#06241E" d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>',
+    alert: '<svg width="28" height="28" viewBox="0 0 24 24"><path fill="#06241E" d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>'
+  };
+  var STATE_LABEL = { NOT_STARTED: 'Belum Dimulai', OPEN: 'Pemungutan Suara Dibuka', CLOSED: 'Pemungutan Suara Ditutup', PUBLISHED: 'Hasil Dipublikasikan', TAMPERED: 'Terindikasi Manipulasi' };
+  var STATE_TONE = { NOT_STARTED: '', OPEN: 't-ok', CLOSED: 't-warn', PUBLISHED: 't-info', TAMPERED: 't-bad' };
+  var STATE_HINT = {
+    NOT_STARTED: 'Panitia sedang menyiapkan kandidat dan daftar pemilih.',
+    OPEN: 'Pemungutan suara sedang berlangsung.',
+    CLOSED: 'Pemungutan suara selesai. Kotak suara menunggu dibuka dengan PIN KPU dan PIN Panwas.',
+    PUBLISHED: 'Hasil resmi sudah diumumkan dan bisa dilihat di bawah.',
+    TAMPERED: 'Kotak suara dibekukan karena ada data surat suara yang berubah.'
+  };
+  var REPORT_LABEL = { SUBMITTED: 'Diterima', IN_REVIEW: 'Sedang Ditinjau', RESOLVED: 'Selesai', REJECTED: 'Ditolak' };
+  var REPORT_TONE = { SUBMITTED: 't-info', IN_REVIEW: 't-warn', RESOLVED: 't-ok', REJECTED: 't-bad' };
+
+  function initialData() {
+    return {
+      user: null, role: null,
+      election: 'OPEN',
+      tampered: false,
+      ident: 'anon',
+      candidates: [
+        { id: 'C01', name: '01 - Andi Pratama & Siti Rahma', vm: 'Visi: Kampus inklusif dan transparan.\nMisi: Dashboard anggaran terbuka, forum aspirasi bulanan, beasiswa berbasis kebutuhan.', fund: 85000000, sum: 'Iuran anggota Rp 40 jt, donasi alumni Rp 35 jt, sponsor UMKM Rp 10 jt.', base: 8 },
+        { id: 'C02', name: '02 - Budi Santoso & Rina Wijaya', vm: 'Visi: Organisasi yang melayani dan berintegritas.\nMisi: Layanan pengaduan 24 jam, audit kegiatan terbuka, program magang mitra industri.', fund: 120000000, sum: 'Donasi perorangan Rp 70 jt, penggalangan dana acara Rp 50 jt.', base: 10 },
+        { id: 'C03', name: '03 - Citra Lestari & Dimas Saputra', vm: 'Visi: Lingkungan hijau dan setara untuk semua.\nMisi: Program kampus bebas plastik, akses fasilitas disabilitas, kesetaraan gender dalam kepengurusan.', fund: 64500000, sum: 'Iuran anggota Rp 30 jt, donasi komunitas Rp 34,5 jt.', base: 5 }
+      ],
+      voters: [
+        { u: 'pemilih1', nik: '3201000000000001', voted: false },
+        { u: 'pemilih2', nik: '3201000000000002', voted: false },
+        { u: 'pemilih3', nik: '3201000000000003', voted: false },
+        { u: 'pemilih4', nik: '3201000000000004', voted: false },
+        { u: 'pemilih5', nik: '3201000000000005', voted: false }
+      ],
+      extraVotes: {},
+      receipts: ['9f2c4e1a7b3d5c8e0f6a2b4c6d8e0f1a3b5c7d9e1f2a4b6c8d0e2f4a6b8c0d2e4'],
+      sampleBallots: 23,
+      reports: [
+        { id: 'r1', code: 'LPR-7KQ2MD', who: 'Anonim', desc: 'Ada pembagian amplop di dekat TPS gedung B sekitar pukul 08.30.', status: 'IN_REVIEW', at: '22 Nov 2026 08.41' },
+        { id: 'r2', code: 'LPR-H4XN9P', who: 'pemilih3 (Pemilih)', desc: 'Poster kandidat masih terpasang di area kampus pada masa tenang.', status: 'SUBMITTED', at: '22 Nov 2026 09.05' }
+      ],
+      lastReceipt: null,
+      candFormOpen: false,
+      integrity: 'idle'
+    };
+  }
+  var S = initialData();
+
+  // ---------- util ----------
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function rupiah(n) { return 'Rp ' + Math.round(n).toLocaleString('id-ID'); }
+  function maskNik(n) { return n.slice(0, 4) + '********' + n.slice(-4); }
+  function randHex(len) {
+    var a = new Uint8Array(len / 2); (window.crypto || window.msCrypto).getRandomValues(a);
+    return Array.prototype.map.call(a, function (b) { return ('0' + b.toString(16)).slice(-2); }).join('');
+  }
+  function ticketCode() {
+    var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', s = 'LPR-';
+    for (var i = 0; i < 6; i++) s += chars[Math.floor(Math.random() * chars.length)];
+    return s;
+  }
+  function splitName(name) {
+    var m = /^\s*(\d+)\s*[-–.]\s*(.+)$/.exec(name);
+    return m ? { no: m[1].length === 1 ? '0' + m[1] : m[1], name: m[2] } : { no: '–', name: name };
+  }
+  function totalBallots() {
+    var n = S.sampleBallots; for (var k in S.extraVotes) n += S.extraVotes[k]; return n;
+  }
+  function roleLabel(r) { return r === 'voter' ? 'Pemilih' : r === 'panwas' ? 'Pengawas (Panwas)' : 'Panitia (KPU)'; }
+  function badge(text, tone) { return '<span class="badge ' + (tone || '') + '">' + esc(text) + '</span>'; }
+
+  var toastTimer;
+  function toast(msg) {
+    var old = document.querySelector('.toast'); if (old) old.remove();
+    var t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status'); t.textContent = msg;
+    $('device').appendChild(t); clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.remove(); }, 2600);
+  }
+  function dialog(title, msg, okText, onOk, cancelText) {
+    var o = $('overlay');
+    o.innerHTML = '<div class="scrim"><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-t"><h2 id="dlg-t">' + esc(title) + '</h2><p>' + esc(msg) + '</p><div class="actions">' +
+      (cancelText ? '<button class="btn text" type="button" id="dlg-cancel">' + esc(cancelText) + '</button>' : '') +
+      '<button class="btn text" type="button" id="dlg-ok">' + esc(okText || 'Mengerti') + '</button></div></div></div>';
+    var close = function (ok) { o.innerHTML = ''; if (ok && onOk) onOk(); else if (!ok && dialog.onCancel) dialog.onCancel(); dialog.onCancel = null; };
+    $('dlg-ok').onclick = function () { close(true); };
+    if (cancelText) $('dlg-cancel').onclick = function () { close(false); };
+    $('dlg-ok').focus();
+  }
+
+  // ---------- header layar turunan ----------
+  function header(id, sub, badgeHtml) {
+    var h = document.querySelector('#' + id + ' .header');
+    var parent = id === 's-dpt' ? 'kpu' : 'home';
+    h.innerHTML = '<button class="back" type="button" data-go="' + parent + '" aria-label="Kembali">' + ICON.back + '</button>' +
+      '<div class="h-title">' + esc(h.getAttribute('data-header')) + '</div>' +
+      (sub ? '<div class="h-sub">' + esc(sub) + '</div>' : '') +
+      (badgeHtml ? '<div class="h-badge">' + badgeHtml + '</div>' : '');
+  }
+
+  // ---------- navigasi ----------
+  var current = 'login';
+  function go(name) {
+    if (name !== 'login' && !S.user) name = 'login';
+    if (name === 'login') { S.user = null; S.role = null; }
+    current = name;
+    var screens = document.querySelectorAll('.screen');
+    for (var i = 0; i < screens.length; i++) screens[i].hidden = screens[i].id !== 's-' + name;
+    render[name] && render[name]();
+    window.scrollTo(0, 0);
+  }
+
+  // ---------- komponen ----------
+  function ballotCard(c, opts) {
+    var n = splitName(c.name);
+    return '<div class="ballot' + (opts && opts.clickable ? ' clickable' : '') + '" data-cid="' + c.id + '"' + (opts && opts.clickable ? ' tabindex="0" role="button" aria-label="Ubah ' + esc(n.name) + '"' : '') + '>' +
+      '<div class="ballot-no"><b>' + n.no + '</b><span class="punch" aria-hidden="true"></span></div>' +
+      '<div class="grow"><h3>' + esc(n.name) + '</h3><p class="vm">' + esc(c.vm) + '</p><hr>' +
+      '<div class="fund"><span class="muted" style="margin:0">Dana kampanye</span><strong>' + rupiah(c.fund) + '</strong></div>' +
+      '<p class="muted">' + esc(c.sum || 'Rincian sumber dana belum dilaporkan.') + '</p>' +
+      (opts && opts.coblos ? '<button class="btn coblos" type="button" data-coblos="' + c.id + '">Coblos</button>' : '') +
+      '</div></div>';
+  }
+  function results() {
+    var total = totalBallots();
+    var rows = S.candidates.map(function (c) {
+      var v = c.base + (S.extraVotes[c.id] || 0);
+      return { name: splitName(c.name).name, v: v, pct: total ? v * 100 / total : 0 };
+    }).sort(function (a, b) { return b.v - a.v; });
+    return rows.map(function (r, i) {
+      return '<div class="result"><div class="top"><strong>' + esc(r.name) + '</strong><span class="pct">' + r.pct.toFixed(1) + '%</span></div>' +
+        '<div class="track"><span class="' + (i === 0 ? 'lead' : '') + '" style="width:' + r.pct.toFixed(1) + '%"></span></div>' +
+        '<p class="muted" style="margin-top:4px">' + r.v + ' suara</p></div>';
+    }).join('');
+  }
+  function reportCard(r, actions) {
+    return '<div class="card pad-16 report-card"><div class="head"><span class="code">' + esc(r.code) + '</span>' + badge(REPORT_LABEL[r.status], REPORT_TONE[r.status]) + '</div>' +
+      '<p>' + esc(r.desc) + '</p><p class="muted" style="margin-top:6px">' + esc(r.who) + ', ' + esc(r.at) + '</p>' +
+      (actions ? '<div class="btn-row three" style="margin-top:10px"><button class="btn tonal" type="button" data-rs="' + r.id + ':IN_REVIEW">Tinjau</button><button class="btn tonal" type="button" data-rs="' + r.id + ':RESOLVED">Selesai</button><button class="btn outline" style="color:var(--bad)" type="button" data-rs="' + r.id + ':REJECTED">Tolak</button></div>' : '') +
+      '</div>';
+  }
+  function groupHash(h) {
+    var out = '';
+    for (var i = 0; i < h.length; i += 4) { if (i) out += (i % 16 === 0 ? '\n' : ' '); out += h.slice(i, i + 4); }
+    return out;
+  }
+
+  // ---------- render per layar ----------
+  var render = {};
+  render.login = function () { $('login-err').hidden = true; };
+
+  render.home = function () {
+    $('home-greet').textContent = 'Halo, ' + S.user;
+    $('home-role').textContent = roleLabel(S.role);
+    var idx = { NOT_STARTED: 0, OPEN: 1, CLOSED: 2, PUBLISHED: 3, TAMPERED: 3 }[S.election];
+    var labels = ['Persiapan', 'Pemungutan', 'Ditutup', S.election === 'TAMPERED' ? 'Dibekukan' : 'Hasil'];
+    $('stepper').innerHTML = labels.map(function (l, i) {
+      var cls = i < idx ? 'done' : i === idx ? (S.election === 'TAMPERED' ? 'frozen' : 'now') : '';
+      return '<div class="step ' + cls + '"' + (i === idx ? ' aria-current="step"' : '') + '><i></i><span>' + l + '</span></div>';
+    }).join('');
+    $('state-hint').textContent = STATE_HINT[S.election];
+    var pa = $('primary-action');
+    pa.textContent = S.role === 'voter' ? 'Masuk bilik suara' : S.role === 'panwas' ? 'Periksa kotak suara' : 'Kelola pemilu';
+    pa.setAttribute('data-go', S.role === 'voter' ? 'vote' : S.role === 'panwas' ? 'panwas' : 'kpu');
+    $('report-desc').textContent = S.role === 'panwas' ? 'Tinjau dan tindak lanjuti laporan masuk' : 'Laporkan kecurangan, boleh tanpa identitas';
+    if (S.election === 'PUBLISHED') {
+      $('home-results').innerHTML = results();
+    } else {
+      var frozen = S.election === 'TAMPERED';
+      $('home-results').innerHTML = '<div class="locked"><span class="ic-circle" style="background:' + (frozen ? 'var(--bad)' : 'var(--accent)') + '">' + (frozen ? ICON.alert : ICON.lock) + '</span><span>' +
+        (frozen ? 'Rekapitulasi dibekukan. Pengawas sedang mengaudit kotak suara.' : 'Hasil masih terkunci. Kotak suara hanya bisa dibuka dengan PIN KPU dan PIN Panwas setelah pemungutan ditutup.') + '</span></div>';
+    }
+    $('home-candidates').innerHTML = S.candidates.map(function (c) { return ballotCard(c); }).join('');
+    $('ballot-count').textContent = totalBallots() + ' surat suara tercatat di kotak suara';
+    $('verify-badge').hidden = true;
+    if (S.lastReceipt && !$('in-receipt').value) $('in-receipt').value = S.lastReceipt;
+  };
+
+  render.vote = function () {
+    var me = S.voters.filter(function (v) { return v.u === S.user; })[0];
+    var canVote = S.election === 'OPEN' && me && !me.voted;
+    var hint = S.election !== 'OPEN' ? 'Bilik suara belum bisa dipakai. Status saat ini: ' + STATE_LABEL[S.election].toLowerCase() + '.'
+      : (me && me.voted) ? 'Anda sudah menggunakan hak pilih. Terima kasih sudah ikut memilih.'
+      : 'Coblos satu pasangan calon. Pilihan dienkripsi dan disimpan tanpa identitas Anda.';
+    header('s-vote', hint);
+    $('vote-receipt').innerHTML = '';
+    $('vote-candidates').hidden = false;
+    $('vote-candidates').innerHTML = S.candidates.map(function (c) { return ballotCard(c, { coblos: canVote }); }).join('');
+  };
+
+  function showReceipt(hash) {
+    header('s-vote', 'Terima kasih sudah menggunakan hak pilih Anda.');
+    $('vote-candidates').hidden = true;
+    $('vote-receipt').innerHTML = '<div class="card lift receipt slide-in"><span class="ic-circle big">' + ICON.check + '</span>' +
+      '<h2>Suara Anda tercatat</h2><p class="muted" style="margin-top:4px">Simpan struk ini. Isinya membuktikan suara Anda ada di kotak suara tanpa menunjukkan pilihan Anda.</p>' +
+      '<div class="tear"></div><p class="muted lbl">Receipt Hash (SHA-256)</p><div class="hash" id="receipt-hash">' + groupHash(hash) + '</div>' +
+      '<button class="btn big" type="button" id="btn-copy">Salin Receipt Hash</button><button class="btn text" type="button" data-go="home">Kembali ke beranda</button></div>';
+    $('btn-copy').onclick = function () {
+      var done = function () { toast('Receipt Hash disalin'); };
+      try { navigator.clipboard.writeText(hash).then(done, function () { selectHash(); }); } catch (e) { selectHash(); }
+    };
+  }
+  function selectHash() {
+    var r = document.createRange(); r.selectNodeContents($('receipt-hash'));
+    var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); toast('Hash sudah diblok, salin dengan Ctrl+C');
+  }
+
+  render.report = function () {
+    var auditor = S.role === 'panwas';
+    header('s-report', auditor ? 'Tinjau laporan yang masuk dan perbarui statusnya agar pelapor bisa melacaknya.' : 'Laporkan dugaan kecurangan. Anda bisa melapor tanpa menyebutkan nama.');
+    document.querySelector('#s-report .h-title').textContent = auditor ? 'Tindak lanjut laporan' : 'Laporan pelanggaran';
+    $('report-form').hidden = auditor;
+    $('panwas-reports').hidden = !auditor;
+    $('ticket-panel').innerHTML = '';
+    $('track-result').innerHTML = '';
+    $('report-err').hidden = true;
+    setIdent(S.ident);
+    if (auditor) renderReportList();
+  };
+  function renderReportList() {
+    $('report-list').innerHTML = S.reports.length ? S.reports.map(function (r) { return reportCard(r, true); }).join('')
+      : '<p class="muted" style="margin-top:6px">Belum ada laporan. Laporan dari pemilih akan muncul di sini.</p>';
+  }
+  function setIdent(v) {
+    S.ident = v;
+    var b = document.querySelectorAll('[data-ident]');
+    for (var i = 0; i < b.length; i++) b[i].setAttribute('aria-pressed', b[i].getAttribute('data-ident') === v ? 'true' : 'false');
+    $('ident-hint').textContent = v === 'anon' ? 'Nama Anda tidak disimpan. Pengawas hanya melihat "Anonim".' : 'Pengawas melihat username Anda dan dapat menghubungi Anda.';
+  }
+
+  render.panwas = function () {
+    header('s-panwas', 'Pastikan tidak ada surat suara yang diubah, dihapus, atau disisipkan.', badge(STATE_LABEL[S.election], STATE_TONE[S.election]));
+    paintIntegrity();
+  };
+  function paintIntegrity() {
+    var n = totalBallots(), html;
+    if (S.integrity === 'ok') {
+      html = '<span class="ic-circle xl" style="background:var(--ok)">' + ICON.check + '</span><h2 style="color:var(--ok)">Kotak suara utuh</h2><p class="muted" style="margin-top:6px">Semua ' + n + ' surat suara cocok dengan hash-nya, dari awal sampai akhir rantai.</p>';
+    } else if (S.integrity === 'bad') {
+      html = '<span class="ic-circle xl" style="background:var(--bad)">' + ICON.alert + '</span><h2 style="color:var(--bad)">Terdeteksi manipulasi</h2><p class="muted" style="margin-top:6px">Ada surat suara yang isinya tidak cocok dengan hash. Rekapitulasi akan dibekukan saat kotak dibuka.</p>';
+    } else {
+      html = '<span class="ic-circle xl" style="background:var(--neutral)">' + ICON.lock + '</span><h2>Belum diperiksa</h2><p class="muted" style="margin-top:6px">' + n + ' surat suara di kotak. Jalankan pemeriksaan untuk memvalidasi setiap hash SHA-256.</p>';
+    }
+    $('integrity').innerHTML = html + '<button class="btn big" type="button" id="btn-check" style="margin-top:20px">Periksa rantai hash</button>';
+    $('btn-check').onclick = function () { S.integrity = S.tampered ? 'bad' : 'ok'; paintIntegrity(); };
+  }
+
+  render.kpu = function () {
+    header('s-kpu', 'Siapkan kandidat dan pemilih, jalankan pemungutan suara, lalu buka kotak suara bersama pengawas.');
+    $('cand-form').hidden = !S.candFormOpen;
+    $('btn-cand-toggle').textContent = S.candFormOpen ? 'Tutup formulir' : 'Tambah kandidat';
+    $('kpu-candidates').innerHTML = S.candidates.map(function (c) { return ballotCard(c, { clickable: true }); }).join('');
+    var voted = S.voters.filter(function (v) { return v.voted; }).length;
+    $('dpt-summary').textContent = S.voters.length + ' pemilih terdaftar, ' + voted + ' sudah memilih';
+    var st = $('kpu-state'); st.className = 'badge ' + STATE_TONE[S.election]; st.textContent = STATE_LABEL[S.election];
+    $('kpu-hint').textContent = STATE_HINT[S.election];
+    $('kpu-results').innerHTML = S.election === 'PUBLISHED' ? results() : '';
+  };
+
+  render.dpt = function () {
+    header('s-dpt', 'Hanya panitia yang dapat mendaftarkan pemilih.');
+    var locked = S.election !== 'NOT_STARTED' && S.election !== 'OPEN';
+    $('btn-register').disabled = locked;
+    $('dpt-hint').textContent = locked ? 'Daftar pemilih sudah dikunci karena pemungutan suara telah ditutup.' : 'Satu NIK hanya untuk satu akun. Daftar dikunci setelah pemungutan suara ditutup.';
+    renderVoters();
+  };
+  function renderVoters() {
+    var q = $('in-search').value.trim().toLowerCase();
+    var list = S.voters.filter(function (v) { return !q || v.u.indexOf(q) >= 0; });
+    $('dpt-total').textContent = S.voters.length;
+    $('dpt-voted').textContent = S.voters.filter(function (v) { return v.voted; }).length;
+    $('voter-list').hidden = !list.length;
+    $('voter-list').innerHTML = list.map(function (v) {
+      return '<div class="voter-row"><span class="grow"><strong>' + esc(v.u) + '</strong><span class="muted mono" style="font-size:12px">NIK ' + maskNik(v.nik) + '</span></span>' +
+        badge(v.voted ? 'Sudah memilih' : 'Belum memilih', v.voted ? 't-ok' : '') + '</div>';
+    }).join('');
+    $('voter-empty').hidden = !!list.length;
+    $('voter-empty').textContent = S.voters.length ? 'Tidak ada username yang cocok dengan "' + q + '".' : 'Belum ada pemilih. Daftarkan pemilih pertama lewat formulir di atas.';
+  }
+
+  // ---------- aksi ----------
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('[data-go],[data-demo],[data-eye],[data-coblos],[data-ident],[data-rs],[data-cid]');
+    if (!t) return;
+    if (t.hasAttribute('data-go')) { go(t.getAttribute('data-go')); return; }
+    if (t.hasAttribute('data-demo')) { $('in-user').value = t.getAttribute('data-demo'); $('in-pass').value = '123456'; return; }
+    if (t.hasAttribute('data-eye')) { var p = $(t.getAttribute('data-eye')); p.type = p.type === 'password' ? 'text' : 'password'; return; }
+    if (t.hasAttribute('data-ident')) { setIdent(t.getAttribute('data-ident')); return; }
+    if (t.hasAttribute('data-coblos')) { confirmVote(t); return; }
+    if (t.hasAttribute('data-rs')) {
+      var parts = t.getAttribute('data-rs').split(':');
+      S.reports.forEach(function (r) { if (r.id === parts[0]) { r.status = parts[1]; toast(r.code + ': ' + REPORT_LABEL[parts[1]]); } });
+      renderReportList(); return;
+    }
+    if (t.hasAttribute('data-cid') && current === 'kpu') { fillCandidate(t.getAttribute('data-cid')); }
+  });
+  document.addEventListener('keydown', function (e) {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('clickable')) { e.preventDefault(); fillCandidate(e.target.getAttribute('data-cid')); }
+    if (e.key === 'Escape' && $('overlay').innerHTML) { var c = $('dlg-cancel') || $('dlg-ok'); c.click(); }
+  });
+
+  $('login-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var u = $('in-user').value.trim().toLowerCase(), p = $('in-pass').value, err = $('login-err');
+    if (!u || !p) { err.textContent = 'Username dan kata sandi wajib diisi.'; err.hidden = false; return; }
+    var role = u === 'panwas1' ? 'panwas' : u === 'kpu1' ? 'kpu' : S.voters.some(function (v) { return v.u === u; }) ? 'voter' : null;
+    var pass = role === 'voter' ? (S.voters.filter(function (v) { return v.u === u; })[0].pass || '123456') : '123456';
+    if (!role || p !== pass) { err.textContent = 'Username atau kata sandi salah.'; err.hidden = false; return; }
+    S.user = u; S.role = role; $('in-pass').value = ''; $('in-receipt').value = '';
+    go('home');
+  });
+
+  $('btn-verify').onclick = function () {
+    var v = $('in-receipt').value.replace(/\s+/g, '').toLowerCase(), b = $('verify-badge');
+    if (!v) { toast('Tempel Receipt Hash dari struk Anda terlebih dahulu.'); return; }
+    var ok = S.receipts.indexOf(v) >= 0;
+    b.className = 'badge ' + (ok ? 't-ok' : 't-bad'); b.textContent = ok ? 'Tercatat di kotak suara' : 'Tidak ditemukan'; b.hidden = false;
+  };
+
+  function confirmVote(btn) {
+    var card = btn.closest('.ballot'), punch = card.querySelector('.punch'), id = btn.getAttribute('data-coblos');
+    var c = S.candidates.filter(function (x) { return x.id === id; })[0];
+    punch.classList.add('on');
+    dialog.onCancel = function () { punch.classList.remove('on'); };
+    dialog('Coblos pasangan ini?', c.name + '\n\nPilihan tidak bisa diubah setelah suara dikirim.', 'Kirim suara', function () {
+      var me = S.voters.filter(function (v) { return v.u === S.user; })[0];
+      if (!me || me.voted || S.election !== 'OPEN') { dialog('Suara tidak terkirim', 'Anda sudah menggunakan hak pilih.'); render.vote(); return; }
+      me.voted = true; S.extraVotes[id] = (S.extraVotes[id] || 0) + 1;
+      var h = randHex(64); S.receipts.push(h); S.lastReceipt = h; S.integrity = 'idle';
+      showReceipt(h);
+    }, 'Batal');
+  }
+
+  $('in-report').addEventListener('input', function () { $('report-count').textContent = this.value.length + '/500'; });
+  $('report-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var d = $('in-report').value.trim(), err = $('report-err');
+    if (d.length < 10) { err.textContent = 'Uraian laporan minimal 10 karakter.'; err.hidden = false; return; }
+    err.hidden = true;
+    var code = ticketCode(), now = new Date();
+    S.reports.unshift({ id: 'r' + Date.now(), code: code, who: S.ident === 'anon' ? 'Anonim' : S.user + ' (' + roleLabel(S.role) + ')', desc: d, status: 'SUBMITTED',
+      at: now.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) + ' ' + now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) });
+    $('in-report').value = ''; $('report-count').textContent = '0/500';
+    $('ticket-panel').innerHTML = '<div class="ticket"><div>Laporan terkirim. Simpan kode tiket ini:</div><div class="code">' + code + '</div><p class="muted" style="margin-top:4px">Pakai kode ini untuk melacak tindak lanjut pengawas, termasuk untuk laporan anonim.</p></div>';
+    $('in-ticket').value = code;
+  });
+  $('btn-track').onclick = function () {
+    var q = $('in-ticket').value.trim().toUpperCase();
+    var r = S.reports.filter(function (x) { return x.code === q; })[0];
+    $('track-result').innerHTML = r ? reportCard(r, false) : '';
+    if (!r) toast('Kode tiket tidak ditemukan. Periksa kembali penulisannya.');
+  };
+
+  $('btn-tamper').onclick = function () {
+    dialog('Ubah data surat suara?', 'Isi surat suara pertama akan diubah langsung di database. Gunakan hanya untuk demonstrasi.', 'Ubah data', function () {
+      S.tampered = true; S.integrity = 'idle'; paintIntegrity(); toast('Data diubah. Jalankan pemeriksaan rantai hash.');
+    }, 'Batal');
+  };
+
+  $('btn-cand-toggle').onclick = function () { S.candFormOpen = !S.candFormOpen; render.kpu(); };
+  function fillCandidate(id) {
+    var c = S.candidates.filter(function (x) { return x.id === id; })[0]; if (!c) return;
+    $('in-cid').value = c.id; $('in-cname').value = c.name; $('in-cvm').value = c.vm; $('in-cfund').value = c.fund; $('in-csum').value = c.sum;
+    S.candFormOpen = true; render.kpu(); $('in-cname').focus(); toast('Mengubah kandidat ' + c.id);
+  }
+  $('cand-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var id = $('in-cid').value.trim().toUpperCase(), name = $('in-cname').value.trim(), fund = Number($('in-cfund').value.replace(/\D/g, '') || 0), err = $('cand-err');
+    if (!id) { err.textContent = 'Nomor/ID kandidat wajib diisi.'; err.hidden = false; return; }
+    if (!name) { err.textContent = 'Nama kandidat wajib diisi.'; err.hidden = false; return; }
+    err.hidden = true;
+    var data = { id: id, name: name, vm: $('in-cvm').value.trim(), fund: fund, sum: $('in-csum').value.trim(), base: 0 };
+    var found = false;
+    S.candidates = S.candidates.map(function (c) { if (c.id === id) { found = true; data.base = c.base; return data; } return c; });
+    if (!found) S.candidates.push(data);
+    ['in-cid', 'in-cname', 'in-cvm', 'in-cfund', 'in-csum'].forEach(function (k) { $(k).value = ''; });
+    S.candFormOpen = false; render.kpu(); toast('Kandidat disimpan');
+  });
+
+  $('btn-open').onclick = function () {
+    if (S.election !== 'NOT_STARTED') { dialog('Status belum berubah', 'Pemungutan suara hanya bisa dibuka sekali, dari status Belum Dimulai.'); return; }
+    S.election = 'OPEN'; render.kpu(); toast('Pemungutan suara dibuka');
+  };
+  $('btn-close').onclick = function () {
+    if (S.election !== 'OPEN') { dialog('Status belum berubah', 'Pemungutan suara belum dibuka atau sudah ditutup.'); return; }
+    S.election = 'CLOSED'; render.kpu(); toast('Pemungutan suara ditutup');
+  };
+  $('btn-unlock').onclick = function () {
+    var k = $('in-pin-kpu').value, p = $('in-pin-panwas').value;
+    if (S.election === 'PUBLISHED') return dialog('Kotak suara tidak dapat dibuka', 'Hasil sudah dipublikasikan.');
+    if (S.election === 'TAMPERED') return dialog('Kotak suara tidak dapat dibuka', 'Kotak suara dibekukan karena terindikasi manipulasi.');
+    if (S.election !== 'CLOSED') return dialog('Kotak suara tidak dapat dibuka', 'Tutup pemungutan suara terlebih dahulu.');
+    if (k !== '1111' || p !== '2222') return dialog('Kotak suara tidak dapat dibuka', 'PIN KPU atau PIN Panwas tidak valid.');
+    $('in-pin-kpu').value = ''; $('in-pin-panwas').value = '';
+    if (S.tampered) { S.election = 'TAMPERED'; render.kpu(); return dialog('Kotak suara tidak dapat dibuka', 'TAMPER ALERT: rantai hash rusak. Kotak suara dibekukan.'); }
+    S.election = 'PUBLISHED'; render.kpu();
+    dialog('Kotak suara dibuka', 'Rantai hash utuh. Hasil ' + S.candidates.length + ' pasangan calon sudah diumumkan di papan transparansi.');
+  };
+  $('btn-reset').onclick = function () {
+    dialog('Reset data demo?', 'Semua suara, laporan, hasil, pemilih baru, dan perubahan kandidat akan dihapus. Data kembali seperti saat aplikasi pertama dipasang.', 'Reset data', function () {
+      S = initialData(); toast('Data demo dikembalikan ke awal'); go('login');
+    }, 'Batal');
+  };
+
+  $('in-nik').addEventListener('input', function () { this.value = this.value.replace(/\D/g, ''); $('nik-count').textContent = this.value.length + '/16'; });
+  $('in-search').addEventListener('input', renderVoters);
+  $('dpt-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var nik = $('in-nik').value.trim(), u = $('in-vuser').value.trim().toLowerCase(), pw = $('in-vpass').value, msg = null;
+    if (!/^\d{16}$/.test(nik)) msg = 'NIK harus 16 digit angka.';
+    else if (!/^[a-z0-9_]{4,20}$/.test(u)) msg = 'Username 4–20 karakter: huruf kecil, angka, atau garis bawah.';
+    else if (pw.length < 6) msg = 'Kata sandi awal minimal 6 karakter.';
+    else if (S.voters.some(function (v) { return v.nik === nik; })) msg = 'NIK sudah terdaftar di DPT.';
+    else if (S.voters.some(function (v) { return v.u === u; }) || u === 'panwas1' || u === 'kpu1') msg = 'Username sudah dipakai.';
+    if (msg) return dialog('Pemilih belum terdaftar', msg);
+    S.voters.push({ u: u, nik: nik, voted: false, pass: pw });
+    S.voters.sort(function (a, b) { return a.u < b.u ? -1 : 1; });
+    ['in-nik', 'in-vuser', 'in-vpass'].forEach(function (k) { $(k).value = ''; }); $('nik-count').textContent = '0/16';
+    renderVoters();
+    dialog('Pemilih terdaftar', 'Username: ' + u + '\nNIK: ' + maskNik(nik) + '\n\nBerikan username dan kata sandi awal kepada pemilih.');
+  });
+
+  $('restart').onclick = function () { S = initialData(); $('overlay').innerHTML = ''; go('login'); toast('Prototipe dimulai ulang'); };
+
+  go('login');
+})();
+</script>
