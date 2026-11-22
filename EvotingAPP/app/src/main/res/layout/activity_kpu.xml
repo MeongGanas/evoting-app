@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Dashboard Panitia (KPU)"
+            android:textAppearance="?attr/textAppearanceHeadlineSmall"
+            android:textColor="@color/brand_primary"
+            android:textStyle="bold" />
+
+        <!-- Status pemilu -->
+        <com.google.android.material.card.MaterialCardView
+            style="@style/SectionCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/SectionTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Status Pemungutan Suara" />
+
+                <TextView
+                    android:id="@+id/tvElectionState"
+                    style="@style/Badge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnOpenElection"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Buka" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnCloseElection"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:text="Tutup" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Pendaftaran pemilih (DPT) -->
+        <com.google.android.material.card.MaterialCardView
+            style="@style/SectionCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/SectionTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pendaftaran Pemilih (DPT)" />
+
+                <TextView
+                    style="@style/MutedText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Pemilih hanya dapat didaftarkan oleh KPU. Satu NIK hanya untuk satu akun. DPT dikunci setelah pemungutan suara ditutup." />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="NIK (16 digit)"
+                    app:counterEnabled="true"
+                    app:counterMaxLength="16">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/inputVoterNik"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:maxLength="16" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Username (4–20, huruf kecil/angka/_)">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/inputVoterUsername"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textVisiblePassword|textNoSuggestions"
+                        android:maxLength="20"
+                        android:maxLines="1" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Password awal (min. 6 karakter)"
+                    app:endIconMode="password_toggle">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/inputVoterPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:maxLines="1" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnRegisterVoter"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Daftarkan Pemilih" />
+
+                <TextView
+                    android:id="@+id/tvDptSummary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:textColor="@color/brand_on_primary_container"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:id="@+id/votersContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Buka kotak suara -->
+        <com.google.android.material.card.MaterialCardView
+            style="@style/SectionCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/SectionTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Buka Kotak Suara (2 PIN)" />
+
+                <TextView
+                    style="@style/MutedText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Dekripsi hanya berjalan bila PIN KPU dan PIN Panwas valid serta rantai hash lolos Tamper Check." />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="PIN KPU"
+                        app:endIconMode="password_toggle">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/inputKpuPin"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="numberPassword"
+                            android:maxLength="6" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:hint="PIN Panwas"
+                        app:endIconMode="password_toggle">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/inputPanwasPin"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="numberPassword"
+                            android:maxLength="6" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnUnlock"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Buka Kotak &amp; Hitung Suara" />
+
+                <LinearLayout
+                    android:id="@+id/resultsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Form kandidat -->
+        <com.google.android.material.card.MaterialCardView
+            style="@style/SectionCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/SectionTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tambah / Ubah Kandidat" />
+
+                <TextView
+                    style="@style/MutedText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Ketuk kartu kandidat di bawah untuk mengubahnya. ID yang sama akan memperbarui data." />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="ID Kandidat (mis. C04)">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/inputCandId"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textCapCharacters"
+                        android:maxLines="1" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Nomor &amp; Nama Pasangan">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/inputCandName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPersonName|textCapWords" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Visi &amp; Misi">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/inputCandVision"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="top"
+                        android:inputType="textMultiLine|textCapSentences"
+                        android:minLines="3" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Total Dana Kampanye (Rp)">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/inputCandFund"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Rincian Sumber Dana">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/inputCandFundSummary"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textMultiLine|textCapSentences"
+                        android:minLines="2" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSaveCandidate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Simpan Kandidat" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            style="@style/SectionTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Daftar Kandidat" />
+
+        <LinearLayout
+            android:id="@+id/candidatesContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnResetDemo"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Reset Data Demo (sesi user testing baru)"
+            android:textColor="@color/status_danger" />
+    </LinearLayout>
+</ScrollView>

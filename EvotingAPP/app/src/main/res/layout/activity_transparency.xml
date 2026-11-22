@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvGreeting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?attr/textAppearanceHeadlineSmall"
+            android:textColor="@color/brand_primary"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvRole"
+            style="@style/MutedText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/tvElectionState"
+            style="@style/Badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" />
+
+        <!-- Menu sesuai peran -->
+        <com.google.android.material.card.MaterialCardView
+            style="@style/SectionCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/SectionTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Menu" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnVote"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Masuk Bilik Suara" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnPanwas"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Dashboard Pengawas" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnKpu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Dashboard Panitia &amp; Buka Kotak" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnReport"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Laporan Pelanggaran" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnLogout"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Keluar" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Hasil rekapitulasi -->
+        <com.google.android.material.card.MaterialCardView
+            style="@style/SectionCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/SectionTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Hasil Rekapitulasi" />
+
+                <TextView
+                    android:id="@+id/tvResultsInfo"
+                    style="@style/MutedText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <LinearLayout
+                    android:id="@+id/resultsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Verifikasi receipt -->
+        <com.google.android.material.card.MaterialCardView
+            style="@style/SectionCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/SectionTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Verifikasi Receipt Hash" />
+
+                <TextView
+                    style="@style/MutedText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Tempel struk Receipt Hash untuk memastikan suara Anda tercatat di kotak suara." />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Receipt Hash (64 karakter)">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/inputReceipt"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="monospace"
+                        android:inputType="text"
+                        android:textSize="13sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnVerify"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Verifikasi" />
+
+                <TextView
+                    android:id="@+id/tvVerifyResult"
+                    style="@style/Badge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Kandidat & dana -->
+        <TextView
+            style="@style/SectionTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Kandidat &amp; Laporan Dana Kampanye" />
+
+        <LinearLayout
+            android:id="@+id/candidatesContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <TextView
+            android:id="@+id/tvBallotCount"
+            style="@style/MutedText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center" />
+    </LinearLayout>
+</ScrollView>

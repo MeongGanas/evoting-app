@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Dashboard Pengawas"
+            android:textAppearance="?attr/textAppearanceHeadlineSmall"
+            android:textColor="@color/brand_primary"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvElectionState"
+            style="@style/Badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/integrityCard"
+            style="@style/SectionCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/SectionTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Integritas Kotak Suara" />
+
+                <TextView
+                    android:id="@+id/tvIntegrityStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Belum diperiksa"
+                    android:textAppearance="?attr/textAppearanceTitleLarge"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvIntegrityDetail"
+                    style="@style/MutedText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnTamperCheck"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Jalankan Tamper Check" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnReports"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Tindak Lanjut Laporan Pelanggaran" />
+
+        <TextView
+            style="@style/MutedText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="PIN Panwas diinput bersama PIN KPU pada panel Buka Kotak Suara di perangkat Panitia." />
+
+        <!-- Alat bantu demo -->
+        <com.google.android.material.card.MaterialCardView
+            style="@style/SectionCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            app:cardBackgroundColor="@color/status_warning_bg"
+            app:strokeColor="@color/status_warning">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Alat Bantu Demo"
+                    android:textColor="@color/status_warning"
+                    android:textStyle="bold" />
+
+                <TextView
+                    style="@style/MutedText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Mengubah isi surat suara pertama langsung di database (tanpa memperbarui hash) untuk membuktikan Tamper Check dapat mendeteksi manipulasi." />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSimulateTamper"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Simulasi Manipulasi DB"
+                    android:textColor="@color/status_warning" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+</ScrollView>

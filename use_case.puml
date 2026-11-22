@@ -1,0 +1,92 @@
+@startuml UseCase_EVoting
+top to bottom direction
+skinparam linetype polyline
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam nodesep 25
+skinparam ranksep 35
+skinparam ArrowColor #444444
+skinparam ActorBorderColor #333333
+skinparam ActorBackgroundColor #FFFFFF
+skinparam UsecaseBorderColor #333333
+skinparam UsecaseBackgroundColor #FAFAFA
+
+' ==================== AKTOR ATAS ====================
+actor "Pemilih / Publik" as Pemilih
+
+' ==================== BATAS SISTEM ====================
+rectangle "Sistem E-Voting Terenkripsi & Transparansi Pemilu (Android .apk)" {
+
+  ' --- Kolom Kiri (Use case utama) ---
+  usecase "Lihat Papan Transparansi\n(Kandidat, Dana & Hasil)" as UC_Board
+  usecase "Verifikasi Struk Receipt Hash\ndi Papan Publik" as UC_Verify
+  usecase "Lakukan Pencoblosan\nE-Voting Terenkripsi" as UC_Vote
+  usecase "Laporkan Dugaan\nPelanggaran" as UC_Report
+  usecase "Lacak Status Laporan\n(Kode Tiket)" as UC_Track
+  usecase "Cek Integritas Kotak Suara\n(Tamper Check Hash Chain)" as UC_Tamper
+  usecase "Tindak Lanjut & Update\nStatus Pelanggaran" as UC_Handle
+  usecase "Buka Kotak Suara\n(Otorisasi PIN KPU + PIN Panwas)" as UC_Unlock
+  usecase "Kelola Kandidat &\nLaporan Dana Kampanye" as UC_Manage
+  usecase "Buka / Tutup\nPemungutan Suara" as UC_State
+  usecase "Daftarkan Pemilih\nke DPT" as UC_Dpt_Reg
+
+  ' --- Kolom Kanan (Layanan internal & ekstensi) ---
+  usecase "Validasi Status DPT &\nPemilu Sedang OPEN" as UC_Dpt #EEF4FF
+  usecase "Enkripsi AES &\nCatat Hash Chain (SHA-256)" as UC_Crypto #EEF4FF
+  usecase "Kirim Laporan\nMode Anonim" as UC_Anon #EEF4FF
+  usecase "Tampilkan Peringatan\nManipulasi (Tamper Alert)" as UC_Alert #FFF0F0
+  usecase "Dekripsi & Publikasi\nHasil Rekapitulasi" as UC_Tally #EEF4FF
+
+  ' Pengurutan vertikal
+  UC_Board -[hidden]down- UC_Verify
+  UC_Verify -[hidden]down- UC_Vote
+  UC_Vote -[hidden]down- UC_Report
+  UC_Report -[hidden]down- UC_Track
+  UC_Track -[hidden]down- UC_Tamper
+  UC_Tamper -[hidden]down- UC_Handle
+  UC_Handle -[hidden]down- UC_Unlock
+  UC_Unlock -[hidden]down- UC_Manage
+  UC_Manage -[hidden]down- UC_State
+  UC_State -[hidden]down- UC_Dpt_Reg
+
+  UC_Dpt -[hidden]down- UC_Crypto
+  UC_Crypto -[hidden]down- UC_Anon
+  UC_Anon -[hidden]down- UC_Alert
+  UC_Alert -[hidden]down- UC_Tally
+}
+
+' ==================== AKTOR BAWAH ====================
+actor "Pengawas (Panwas)" as Pengawas
+actor "Panitia (KPU)" as Panitia
+
+Pengawas -[hidden]right- Panitia
+
+' ==================== RELASI AKTOR ====================
+Pemilih -down-> UC_Board
+Pemilih -down-> UC_Verify
+Pemilih -down-> UC_Vote
+Pemilih -down-> UC_Report
+Pemilih -down-> UC_Track
+
+UC_Tamper <-down- Pengawas
+UC_Handle <-down- Pengawas
+UC_Unlock <-down- Pengawas
+
+UC_Unlock <-down- Panitia
+UC_Manage <-down- Panitia
+UC_State <-down- Panitia
+UC_Dpt_Reg <-down- Panitia
+
+' ==================== RELASI INCLUDE & EXTEND ====================
+UC_Vote .right.> UC_Dpt : <<include>>
+UC_Vote .right.> UC_Crypto : <<include>>
+
+UC_Anon .left.> UC_Report : <<extend>>
+
+UC_Alert .left.> UC_Tamper : <<extend>>
+
+
+UC_Unlock .up.> UC_Tamper : <<include>>
+UC_Unlock .right.> UC_Tally : <<include>>
+
+@enduml

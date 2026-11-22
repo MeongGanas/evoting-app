@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Palet civic-tech -->
+    <color name="brand_primary">#1E3A8A</color>
+    <color name="brand_primary_container">#DBE4FF</color>
+    <color name="brand_on_primary_container">#0B1F5C</color>
+    <color name="brand_secondary">#0F766E</color>
+    <color name="brand_secondary_container">#CCF1EC</color>
+    <color name="surface_bg">#F4F6FB</color>
+    <color name="text_muted">#5B6475</color>
+    <color name="outline_soft">#D9DEE8</color>
+
+    <!-- Status -->
+    <color name="status_success">#15803D</color>
+    <color name="status_success_bg">#DCFCE7</color>
+    <color name="status_danger">#B91C1C</color>
+    <color name="status_danger_bg">#FEE2E2</color>
+    <color name="status_warning">#B45309</color>
+    <color name="status_warning_bg">#FEF3C7</color>
+    <color name="status_neutral">#334155</color>
+    <color name="status_neutral_bg">#E2E8F0</color>
+</resources>

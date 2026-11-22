@@ -1,0 +1,393 @@
+@startuml ClassDiagram_EVoting_SOLID
+top to bottom direction
+skinparam linetype ortho
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam packageStyle folder
+skinparam nodesep 20
+skinparam ranksep 60
+
+' =====================================================================
+'  SERVICE (logika bisnis) -> satu service, satu tanggung jawab (SRP)
+' =====================================================================
+package "service" {
+  class VotingService {
+    - userRepo : IUserRepository
+    - ballotRepo : IBallotRepository
+    - electionRepo : IElectionRepository
+    - ballotCipher : IBallotCipher
+    - hashService : IHashChainService
+    + castVote(voter : Voter, candidateId : String) : String
+  }
+
+  class BallotAuditService {
+    - ballotRepo : IBallotRepository
+    - hashService : IHashChainService
+    + BallotAuditService(ballotRepo : IBallotRepository, hashService : IHashChainService)
+    + verifyReceipt(receiptHash : String) : boolean
+    + runTamperCheck() : boolean
+    + countBallots() : int
+  }
+
+  class TallyService {
+    - userRepo : IUserRepository
+    - ballotRepo : IBallotRepository
+    - candidateRepo : ICandidateRepository
+    - electionRepo : IElectionRepository
+    - ballotCipher : IBallotCipher
+    - auditService : BallotAuditService
+    + unlockAndTally(kpuPin : String, panwasPin : String) : List<TallyResult>
+    + getPublishedResults() : List<TallyResult>
+  }
+
+  class ElectionService {
+    - electionRepo : IElectionRepository
+    + ElectionService(electionRepo : IElectionRepository)
+    + getState() : ElectionState
+    + openElection() : boolean
+    + closeElection() : boolean
+  }
+
+  class CandidateService {
+    - candidateRepo : ICandidateRepository
+    + CandidateService(candidateRepo : ICandidateRepository)
+    + getAllCandidates() : List<Candidate>
+    + saveCandidate(candidate : Candidate) : boolean
+  }
+
+  class VoterRegistryService {
+    - userRepo : IUserRepository
+    - electionRepo : IElectionRepository
+    + VoterRegistryService(userRepo : IUserRepository, electionRepo : IElectionRepository)
+    + registerVoter(nik : String, username : String, password : String) : Voter
+    + getAllVoters() : List<Voter>
+  }
+
+  class ReportService {
+    - reportRepo : IReportRepository
+    + ReportService(reportRepo : IReportRepository)
+    + submitReport(actor : User, strategy : IIdentityStrategy, desc : String) : String
+    + trackReport(ticketCode : String) : ViolationReport
+    + getAllReports() : List<ViolationReport>
+    + updateReportStatus(reportId : String, status : ReportStatus) : boolean
+  }
+
+  note top of VotingService
+    Seluruh dependensi service disuntikkan
+    lewat constructor sebagai interface (DIP).
+  end note
+
+  interface IBallotCipher {
+    + encrypt(plainText : String) : String
+    + decrypt(cipherText : String) : String
+  }
+
+  class AesBallotCipher {
+    - ALGORITHM : String
+    - secretKey : SecretKey
+    + encrypt(plainText : String) : String
+    + decrypt(cipherText : String) : String
+  }
+
+  interface IHashChainService {
+    + computeSha256(input : String) : String
+    + computeReceipt(previousHash : String, encryptedPayload : String) : String
+    + verifyChain(ballots : List<EncryptedBallot>) : boolean
+  }
+
+  class Sha256HashChainService {
+    + computeSha256(input : String) : String
+    + computeReceipt(previousHash : String, encryptedPayload : String) : String
+    + verifyChain(ballots : List<EncryptedBallot>) : boolean
+  }
+
+  interface IIdentityStrategy {
+    + resolveReporterId(actor : User) : String
+    + resolveReporterName(actor : User) : String
+  }
+
+  class AnonymousStrategy {
+    + resolveReporterId(actor : User) : String
+    + resolveReporterName(actor : User) : String
+  }
+
+  class IdentifiedStrategy {
+    + resolveReporterId(actor : User) : String
+    + resolveReporterName(actor : User) : String
+  }
+
+}
+
+' =====================================================================
+'  REPOSITORY (akses data SQLite) -> service bergantung pada interface (DIP)
+' =====================================================================
+package "repository" {
+  interface IUserRepository {
+    + hasVoted(userId : String) : boolean
+    + markAsVoted(userId : String) : boolean
+    + verifyRolePin(role : String, rawPin : String) : boolean
+    + registerVoter(voter : Voter, rawPassword : String) : boolean
+    + existsByUsername(username : String) : boolean
+    + existsByNik(nik : String) : boolean
+    + findAllVoters() : List<Voter>
+  }
+
+  class SQLiteUserRepository {
+    + hasVoted(userId : String) : boolean
+    + markAsVoted(userId : String) : boolean
+    + verifyRolePin(role : String, rawPin : String) : boolean
+    + registerVoter(voter : Voter, rawPassword : String) : boolean
+    + existsByUsername(username : String) : boolean
+    + existsByNik(nik : String) : boolean
+    + findAllVoters() : List<Voter>
+  }
+
+  interface IBallotRepository {
+    + insertBallot(ballot : EncryptedBallot) : boolean
+    + getLatestHash() : String
+    + getAllBallotsOrdered() : List<EncryptedBallot>
+    + existsByReceiptHash(receiptHash : String) : boolean
+  }
+
+  class SQLiteBallotRepository {
+    + insertBallot(ballot : EncryptedBallot) : boolean
+    + getLatestHash() : String
+    + getAllBallotsOrdered() : List<EncryptedBallot>
+    + existsByReceiptHash(receiptHash : String) : boolean
+  }
+
+  interface ICandidateRepository {
+    + findAll() : List<Candidate>
+    + save(candidate : Candidate) : boolean
+  }
+
+  class SQLiteCandidateRepository {
+    + findAll() : List<Candidate>
+    + save(candidate : Candidate) : boolean
+  }
+
+  interface IElectionRepository {
+    + getState() : ElectionState
+    + updateState(state : ElectionState) : boolean
+    + saveResults(results : List<TallyResult>) : boolean
+    + getResults() : List<TallyResult>
+  }
+
+  class SQLiteElectionRepository {
+    + getState() : ElectionState
+    + updateState(state : ElectionState) : boolean
+    + saveResults(results : List<TallyResult>) : boolean
+    + getResults() : List<TallyResult>
+  }
+
+  interface IReportRepository {
+    + insert(report : ViolationReport) : boolean
+    + updateStatus(reportId : String, status : ReportStatus) : boolean
+    + findByTicketCode(ticketCode : String) : ViolationReport
+    + findAll() : List<ViolationReport>
+  }
+
+  class SQLiteReportRepository {
+    + insert(report : ViolationReport) : boolean
+    + updateStatus(reportId : String, status : ReportStatus) : boolean
+    + findByTicketCode(ticketCode : String) : ViolationReport
+    + findAll() : List<ViolationReport>
+  }
+
+}
+
+' =====================================================================
+'  ROLE (hierarki pengguna & hak akses) -> interface kecil per kemampuan (ISP)
+' =====================================================================
+package "role" {
+  abstract class User {
+    # userId : String
+    # username : String
+    + getUserId() : String
+    + getUsername() : String
+    {abstract} + getRoleLabel() : String
+  }
+
+  interface IVotable {
+    + canCastVote() : boolean
+  }
+
+  class Voter {
+    - nik : String
+    - hasVoted : boolean
+    + canCastVote() : boolean
+    + getRoleLabel() : String
+  }
+
+  interface IAuditCapable {
+    + canRunTamperCheck() : boolean
+    + canUpdateReport() : boolean
+  }
+
+  class Panwas {
+    + canRunTamperCheck() : boolean
+    + canUpdateReport() : boolean
+    + getRoleLabel() : String
+  }
+
+  interface IElectionManager {
+    + canManageElection() : boolean
+  }
+
+  class KpuAdmin {
+    + canManageElection() : boolean
+    + getRoleLabel() : String
+  }
+}
+
+' =====================================================================
+'  MODEL (entitas data)
+' =====================================================================
+package "model" {
+  class Candidate {
+    - candidateId : String
+    - fullName : String
+    - visionMission : String
+    - campaignFundAmount : double
+    - fundSummary : String
+    + getFormattedFund() : String
+  }
+
+  class EncryptedBallot {
+    - sequenceNo : int
+    - encryptedPayload : String
+    - previousHash : String
+    - receiptHash : String
+    + getReceiptHash() : String
+  }
+  note bottom of EncryptedBallot
+    Tidak menyimpan userId maupun timestamp,
+    sehingga surat suara tidak dapat
+    dikaitkan kembali dengan pemilih.
+  end note
+
+  class ViolationReport {
+    - reportId : String
+    - ticketCode : String
+    - reporterId : String
+    - reporterDisplay : String
+    - description : String
+    - status : ReportStatus
+    - createdAt : long
+  }
+
+  enum ReportStatus {
+    SUBMITTED
+    IN_REVIEW
+    RESOLVED
+    REJECTED
+  }
+
+  class TallyResult {
+    - candidateId : String
+    - candidateName : String
+    - totalVotes : int
+    - percentage : double
+  }
+
+  enum ElectionState {
+    NOT_STARTED
+    OPEN
+    CLOSED
+    PUBLISHED
+    TAMPERED
+  }
+}
+
+' ==================== PENGATUR LAYOUT VERTIKAL ====================
+' (garis tersembunyi agar package tersusun dari atas ke bawah,
+'  maksimal 3 kelas per baris)
+
+' service : service konkret -> interface -> implementasi
+VotingService -[hidden]down- CandidateService
+TallyService -[hidden]down- BallotAuditService
+ElectionService -[hidden]down- ReportService
+ElectionService -[hidden]down- VoterRegistryService
+CandidateService -[hidden]down- IBallotCipher
+BallotAuditService -[hidden]down- IHashChainService
+ReportService -[hidden]down- IIdentityStrategy
+IBallotCipher -[hidden]down- AesBallotCipher
+IHashChainService -[hidden]down- Sha256HashChainService
+
+' service -> repository
+AesBallotCipher -[hidden]down- IUserRepository
+AesBallotCipher -[hidden]down- IBallotRepository
+AesBallotCipher -[hidden]down- ICandidateRepository
+Sha256HashChainService -[hidden]down- IUserRepository
+Sha256HashChainService -[hidden]down- IBallotRepository
+Sha256HashChainService -[hidden]down- ICandidateRepository
+AnonymousStrategy -[hidden]down- IUserRepository
+AnonymousStrategy -[hidden]down- IBallotRepository
+AnonymousStrategy -[hidden]down- ICandidateRepository
+IdentifiedStrategy -[hidden]down- IUserRepository
+IdentifiedStrategy -[hidden]down- IBallotRepository
+IdentifiedStrategy -[hidden]down- ICandidateRepository
+
+' repository : 2 kelompok baris
+SQLiteUserRepository -[hidden]down- IElectionRepository
+SQLiteBallotRepository -[hidden]down- IReportRepository
+
+' repository -> role -> model
+SQLiteElectionRepository -[hidden]down- User
+SQLiteReportRepository -[hidden]down- IAuditCapable
+SQLiteElectionRepository -[hidden]down- IVotable
+SQLiteReportRepository -[hidden]down- IElectionManager
+Voter -[hidden]down- Candidate
+Panwas -[hidden]down- EncryptedBallot
+KpuAdmin -[hidden]down- ViolationReport
+Candidate -[hidden]down- TallyResult
+EncryptedBallot -[hidden]down- ElectionState
+
+' ==================== RELASI SERVICE ====================
+IBallotCipher <|.down. AesBallotCipher
+IHashChainService <|.down. Sha256HashChainService
+IIdentityStrategy <|.down. AnonymousStrategy
+IIdentityStrategy <|.down. IdentifiedStrategy
+
+VotingService --> IUserRepository : checks DPT
+VotingService --> IBallotRepository : stores
+VotingService --> IElectionRepository : checks OPEN
+VotingService --> IBallotCipher : encrypts
+VotingService --> IHashChainService : chains
+
+BallotAuditService --> IBallotRepository : reads
+BallotAuditService --> IHashChainService : verifies
+
+TallyService --> IUserRepository : verifies PIN
+TallyService --> IBallotRepository : reads
+TallyService --> ICandidateRepository : reads
+TallyService --> IElectionRepository : publishes
+TallyService --> IBallotCipher : decrypts
+TallyService --> BallotAuditService : tamper check
+
+ElectionService --> IElectionRepository : manages
+CandidateService --> ICandidateRepository : manages
+VoterRegistryService --> IUserRepository : registers DPT
+VoterRegistryService --> IElectionRepository : checks state
+ReportService --> IReportRepository : persists
+ReportService ..> IIdentityStrategy : uses
+
+' ==================== RELASI REPOSITORY ====================
+IUserRepository <|.down. SQLiteUserRepository
+IBallotRepository <|.down. SQLiteBallotRepository
+ICandidateRepository <|.down. SQLiteCandidateRepository
+IElectionRepository <|.down. SQLiteElectionRepository
+IReportRepository <|.down. SQLiteReportRepository
+
+' ==================== RELASI ROLE ====================
+User <|-down- Voter
+User <|-down- Panwas
+User <|-down- KpuAdmin
+
+IVotable <|.down. Voter
+IAuditCapable <|.down. Panwas
+IElectionManager <|.down. KpuAdmin
+
+' ==================== RELASI MODEL ====================
+ViolationReport --> ReportStatus : has
+@enduml

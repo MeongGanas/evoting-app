@@ -1,0 +1,60 @@
+@startuml Activity_EVoting
+skinparam linetype ortho
+skinparam shadowing false
+skinparam wrapWidth 160
+
+' ==================== TAHAP 1: PEMUNGUTAN SUARA ====================
+|Panitia\n(KPU)|
+start
+:Daftarkan pemilih ke DPT\n(NIK unik, username, password awal);
+:Buka pemungutan suara\n(status pemilu = OPEN);
+
+|Pemilih|
+:Buka bilik suara;
+:Pilih kandidat &\nkonfirmasi Kirim Suara;
+
+|Sistem Android\n(Java & SQLite)|
+:Cek status pemilu, DPT\n& hasVoted di SQLite;
+
+if (Pemilu OPEN, terdaftar &\nbelum memilih?) then (Tidak)
+  :Tolak suara &\ntampilkan pesan;
+  stop
+else (Ya)
+  :Enkripsi pilihan\n(AES Java);
+  :Hitung Receipt Hash =\nSHA-256(previousHash + payload);
+  :Simpan EncryptedBallot (tanpa identitas)\n& set hasVoted = true;
+  :Tampilkan Receipt Hash\nke layar Pemilih;
+endif
+
+|Pemilih|
+:Simpan & verifikasi\nReceipt Hash di Papan Publik;
+
+' ==================== TAHAP 2: BUKA KOTAK SUARA ====================
+|Panitia\n(KPU)|
+:Tutup pemungutan suara\n(status pemilu = CLOSED);
+:Input PIN KPU;
+
+|Pengawas\n(Panwas)|
+:Input PIN Panwas &\nklik Buka Kotak Suara;
+
+|Sistem Android\n(Java & SQLite)|
+if (PIN KPU & PIN Panwas valid?) then (Tidak)
+  :Tolak permintaan\nbuka kotak;
+  stop
+else (Ya)
+  :Jalankan Tamper Check\n(validasi seluruh Hash Chain);
+endif
+
+if (Seluruh rantai hash valid?) then (Tidak)
+  :Tampilkan Tamper Alert\n(status pemilu = TAMPERED);
+
+  |Pengawas\n(Panwas)|
+  :Bekukan rekapitulasi &\naudit sengketa;
+  stop
+else (Ya)
+  |Sistem Android\n(Java & SQLite)|
+  :Dekripsi seluruh ballot\n& hitung total suara;
+  :Publikasikan hasil ke Papan Transparansi\n(status pemilu = PUBLISHED);
+  stop
+endif
+@enduml

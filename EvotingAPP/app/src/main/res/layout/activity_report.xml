@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Laporan Pelanggaran"
+            android:textAppearance="?attr/textAppearanceHeadlineSmall"
+            android:textColor="@color/brand_primary"
+            android:textStyle="bold" />
+
+        <!-- Form laporan -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/formCard"
+            style="@style/SectionCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/SectionTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Kirim Laporan" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Uraikan dugaan pelanggaran (lokasi, waktu, kejadian)">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/inputDescription"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="top"
+                        android:inputType="textMultiLine|textCapSentences"
+                        android:minLines="4" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/switchAnonymous"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:checked="true"
+                    android:text="Kirim sebagai Anonim" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSubmitReport"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Kirim Laporan" />
+
+                <TextView
+                    android:id="@+id/tvTicketResult"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/status_success_bg"
+                    android:padding="12dp"
+                    android:textColor="@color/status_success"
+                    android:textIsSelectable="true"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Lacak -->
+        <com.google.android.material.card.MaterialCardView
+            style="@style/SectionCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/SectionTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Lacak Laporan" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Kode Tiket (mis. LPR-AB12CD)">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/inputTicket"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textCapCharacters"
+                        android:maxLines="1" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnTrack"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Lacak" />
+
+                <LinearLayout
+                    android:id="@+id/trackResultContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Khusus Panwas: semua laporan -->
+        <LinearLayout
+            android:id="@+id/panwasSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                style="@style/SectionTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Semua Laporan (Tindak Lanjut Panwas)" />
+
+            <TextView
+                android:id="@+id/tvNoReports"
+                style="@style/MutedText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Belum ada laporan masuk."
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/reportsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
